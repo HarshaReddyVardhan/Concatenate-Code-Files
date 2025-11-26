@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Project Concatenator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .list-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .tag button {
+            margin-left: 8px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .tag button:hover {
+            background: #d32f2f;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .add-form input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .add-form button {
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .add-form button:hover {
+            background: #45a049;
+        }
+
+        .defaults-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            padding: 12px 24px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-btn">← Back to Home</a>
+
+    <h1>⚙️ Settings</h1>
+    <p class="subtitle">Manage exclude patterns, include extensions, and defaults</p>
+
+    <div id="message" class="message"></div>
+
+    <!-- Exclude Patterns Section -->
+    <div class="section">
+        <h2>Exclude Patterns</h2>
+        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+            Files and folders matching these patterns will be ignored
+        </p>
+        <div id="excludePatternsList" class="list-container">
+            <!-- Loaded dynamically -->
+        </div>
+        <div class="add-form">
+            <input type="text" id="newExcludePattern" placeholder="e.g., *.log or temp/**">
+            <button onclick="addExcludePattern()">Add Pattern</button>
+        </div>
+    </div>
+
+    <!-- Include Extensions Section -->
+    <div class="section">
+        <h2>Include Extensions</h2>
+        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+            Only files with these extensions will be processed
+        </p>
+        <div id="includeExtensionsList" class="list-container">
+            <!-- Loaded dynamically -->
+        </div>
+        <div class="add-form">
+            <input type="text" id="newIncludeExtension" placeholder="e.g., .java or .py">
+            <button onclick="addIncludeExtension()">Add Extension</button>
+        </div>
+    </div>
+
+    <!-- Defaults Section -->
+    <div class="section">
+        <h2>Default Settings</h2>
+        <div class="defaults-form">
+            <div class="form-group">
+                <label for="defaultOutputFolder">Default Output Folder</label>
+                <input type="text" id="defaultOutputFolder" placeholder="concatenated-output">
+            </div>
+            <div class="form-group">
+                <label for="defaultMaxFileSizeMb">Default Max File Size (MB)</label>
+                <input type="number" id="defaultMaxFileSizeMb" placeholder="30" min="1" max="500">
+            </div>
+            <button class="btn-primary" onclick="updateDefaults()">Update Defaults</button>
+        </div>
+    </div>
+
+    <!-- Reset Button -->
+    <button class="btn-danger" onclick="resetSettings()">Reset All Settings to Defaults</button>
+</div>
+
+<script>
+    // Load settings on page load
+    window.addEventListener('DOMContentLoaded', loadSettings);
+
+    async function loadSettings() {
+        try {
+            const response = await fetch('/api/settings');
+            const settings = await response.json();
+
+            // Populate exclude patterns
+            const excludeList = document.getElementById('excludePatternsList');
+            excludeList.innerHTML = '';
+            settings.excludePatterns.forEach(pattern => {
+                excludeList.innerHTML += `
+                        <div class="tag">
+                            ${pattern}
+                            <button onclick="removeExcludePattern('${pattern}')">×</button>
+                        </div>
+                    `;
+            });
+
+            // Populate include extensions
+            const includeList = document.getElementById('includeExtensionsList');
+            includeList.innerHTML = '';
+            settings.includeExtensions.forEach(ext => {
+                includeList.innerHTML += `
+                        <div class="tag">
+                            ${ext}
+                            <button onclick="removeIncludeExtension('${ext}')">×</button>
+                        </div>
+                    `;
+            });
+
+            // Populate defaults
+            document.getElementById('defaultOutputFolder').value = settings.defaultOutputFolder || '';
+            document.getElementById('defaultMaxFileSizeMb').value = settings.defaultMaxFileSizeMb || '';
+
+        } catch (error) {
+            showMessage('Error loading settings: ' + error.message, 'error');
+        }
+    }
+
+    async function addExcludePattern() {
+        const pattern = document.getElementById('newExcludePattern').value.trim();
+        if (!pattern) {
+            showMessage('Please enter a pattern', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/settings/exclude-patterns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pattern })
+            });
+
+            if (response.ok) {
+                document.getElementById('newExcludePattern').value = '';
+                showMessage('Pattern added successfully', 'success');
+                loadSettings();
+            } else {
+                showMessage('Failed to add pattern', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function removeExcludePattern(pattern) {
+        try {
+            const response = await fetch('/api/settings/exclude-patterns/' + encodeURIComponent(pattern), {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showMessage('Pattern removed successfully', 'success');
+                loadSettings();
+            } else {
+                showMessage('Failed to remove pattern', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function addIncludeExtension() {
+        const extension = document.getElementById('newIncludeExtension').value.trim();
+        if (!extension) {
+            showMessage('Please enter an extension', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/settings/include-extensions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ extension })
+            });
+
+            if (response.ok) {
+                document.getElementById('newIncludeExtension').value = '';
+                showMessage('Extension added successfully', 'success');
+                loadSettings();
+            } else {
+                showMessage('Failed to add extension', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function removeIncludeExtension(ext) {
+        try {
+            const response = await fetch('/api/settings/include-extensions/' + encodeURIComponent(ext), {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showMessage('Extension removed successfully', 'success');
+                loadSettings();
+            } else {
+                showMessage('Failed to remove extension', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function updateDefaults() {
+        const outputFolder = document.getElementById('defaultOutputFolder').value.trim();
+        const maxFileSizeMb = parseInt(document.getElementById('defaultMaxFileSizeMb').value);
+
+        try {
+            const response = await fetch('/api/settings/defaults', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ outputFolder, maxFileSizeMb })
+            });
+
+            if (response.ok) {
+                showMessage('Defaults updated successfully', 'success');
+            } else {
+                showMessage('Failed to update defaults', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function resetSettings() {
+        if (!confirm('Are you sure you want to reset all settings to defaults?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/settings/reset', {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                showMessage('Settings reset successfully', 'success');
+                loadSettings();
+            } else {
+                showMessage('Failed to reset settings', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    function showMessage(text, type) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.className = 'message ' + type;
+        message.style.display = 'block';
+
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 5000);
+    }
+</script>
+</body>
+</html>
