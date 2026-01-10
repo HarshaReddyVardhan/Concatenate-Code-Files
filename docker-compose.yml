@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: concatenator-app
+    container_name: concatenator
+    ports:
+      - "8080:8080"
+    # Mount the current directory (project root) to /data inside container
+    # You can change './' to any specific path you want to expose to the app
+    volumes:
+      - ./:/data
+    environment:
+      - APP_IN_DOCKER=true

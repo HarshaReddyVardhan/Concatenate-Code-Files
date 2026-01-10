@@ -26,4 +26,14 @@ public class ConcatenationRequest {
     private Set<String> includeExtensions;
 
     private Boolean incrementalUpdate;
+
+    // AI Agent Features
+    @Builder.Default
+    private Boolean useXmlTags = false;
+
+    @Builder.Default
+    private Boolean includeFileTree = false;
+
+    @Builder.Default
+    private Boolean estimateTokens = false;
 }

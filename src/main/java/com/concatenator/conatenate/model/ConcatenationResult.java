@@ -37,4 +37,8 @@ public class ConcatenationResult {
 
     @Builder.Default
     private List<String> errors = new ArrayList<>();
+
+    private Long estimatedTokenCount;
+
+    private String previewFileTree;
 }

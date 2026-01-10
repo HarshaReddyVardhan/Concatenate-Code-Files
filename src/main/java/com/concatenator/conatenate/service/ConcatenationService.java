@@ -25,11 +25,13 @@ public class ConcatenationService {
     private static final String METADATA_FILE_NAME = ".project-concat-metadata.json";
     private static final String STRUCTURE_FILE_NAME = "PROJECT_STRUCTURE.json";
     private static final String FILE_SEPARATOR = "=== %s ===\n";
+    private static final String XML_FILE_START = "<file path=\"%s\">\n";
+    private static final String XML_FILE_END = "</file>\n";
     private static final long MB_TO_BYTES = 1024 * 1024;
 
     public ConcatenationService(FileHashService fileHashService,
-                                UserSettingsService userSettingsService,
-                                ObjectMapper objectMapper) {
+            UserSettingsService userSettingsService,
+            ObjectMapper objectMapper) {
         this.fileHashService = fileHashService;
         this.userSettingsService = userSettingsService;
         this.objectMapper = objectMapper;
@@ -66,29 +68,53 @@ public class ConcatenationService {
             UserSettings userSettings = userSettingsService.loadSettings();
             Set<String> excludePatterns = mergeSettings(
                     request.getExcludePatterns(),
-                    userSettings.getExcludePatterns()
-            );
+                    userSettings.getExcludePatterns());
             Set<String> includeExtensions = mergeSettings(
                     request.getIncludeExtensions(),
-                    userSettings.getIncludeExtensions()
-            );
+                    userSettings.getIncludeExtensions());
 
-            String outputFolder = request.getOutputFolder() != null
-                    ? request.getOutputFolder()
-                    : userSettings.getDefaultOutputFolder();
+            String outputFolder = request.getOutputFolder();
+            if (outputFolder == null || outputFolder.trim().isEmpty()) {
+                // Default format: ProjectName-Concatenated-Output
+                String projectName = projectPath.getFileName().toString();
+                outputFolder = projectName + "-Concatenated-Output";
+            }
+            // else use the provided folder
 
             int maxFileSizeMb = request.getMaxFileSizeMb() != null
                     ? request.getMaxFileSizeMb()
                     : userSettings.getDefaultMaxFileSizeMb();
 
-            // Step 3: Load previous metadata (for incremental updates)
-            ProjectMetadata previousMetadata = loadMetadata(projectPath);
+            // Step 3: Create output directory (MOVED UP FOR BUG FIX)
+            Path outputPath = projectPath.resolve(outputFolder);
+            Files.createDirectories(outputPath);
+
+            // Step 4: Load previous metadata (for incremental updates) - Uses outputPath
+            // now
+            ProjectMetadata previousMetadata = loadMetadata(outputPath);
             boolean isIncremental = Boolean.TRUE.equals(request.getIncrementalUpdate())
                     && previousMetadata != null;
+
+            // FIX: Add output folder to exclude patterns PRE-SCAN
+            excludePatterns.add(outputFolder);
+            excludePatterns.add(outputFolder + "/**");
+            // Also exclude generic "target" and "build" folders if not already there, just
+            // in case
+            excludePatterns.add("target/**");
+            excludePatterns.add("build/**");
+            excludePatterns.add(".git/**");
 
             // Step 4: Scan project files
             log.info("Scanning project files...");
             List<Path> allFiles = scanProjectFiles(projectPath, excludePatterns, includeExtensions);
+
+            // AUTO-FIX: Double check exclusion
+            if (outputPath.startsWith(projectPath)) {
+                allFiles = allFiles.stream()
+                        .filter(file -> !file.startsWith(outputPath))
+                        .collect(Collectors.toList());
+            }
+
             log.info("Found {} files to process", allFiles.size());
 
             // Step 5: Calculate hashes and detect changes
@@ -126,30 +152,37 @@ public class ConcatenationService {
             // Step 6: Group files by top-level folder
             Map<String, List<Path>> filesByFolder = groupFilesByTopLevelFolder(
                     projectPath,
-                    filesToProcess
-            );
+                    filesToProcess);
 
-            // Step 7: Create output directory
-            Path outputPath = projectPath.resolve(outputFolder);
-            Files.createDirectories(outputPath);
+            // Step 7: Output directory already created in Step 3
+            // Path outputPath = projectPath.resolve(outputFolder);
+            // Files.createDirectories(outputPath);
 
             // Step 8: Generate concatenated files for each folder
             List<String> outputFiles = new ArrayList<>();
             long totalSize = 0;
+            long totalTokens = 0;
+            String asciiTree = null;
+
+            if (Boolean.TRUE.equals(request.getIncludeFileTree())) {
+                asciiTree = generateAsciiTree(projectPath, allFiles);
+            }
 
             for (Map.Entry<String, List<Path>> entry : filesByFolder.entrySet()) {
                 String folderName = entry.getKey();
                 List<Path> files = entry.getValue();
 
-                List<String> generatedFiles = concatenateFilesWithSplit(
+                ConcatenationOutput output = concatenateFilesWithSplit(
                         files,
                         projectPath,
                         outputPath,
                         folderName,
-                        maxFileSizeMb
-                );
+                        maxFileSizeMb,
+                        request.getUseXmlTags(),
+                        request.getIncludeFileTree() ? asciiTree : null);
 
-                outputFiles.addAll(generatedFiles);
+                outputFiles.addAll(output.getFilePaths());
+                totalTokens += output.getTokenCount();
             }
 
             // Step 9: Generate PROJECT_STRUCTURE.json
@@ -166,7 +199,8 @@ public class ConcatenationService {
                             .sum())
                     .build();
 
-            String metadataFile = saveMetadata(projectPath, newMetadata);
+            // FIX: Save metadata to outputPath
+            String metadataFile = saveMetadata(outputPath, newMetadata);
 
             // Step 11: Calculate total output size
             for (String file : outputFiles) {
@@ -188,6 +222,8 @@ public class ConcatenationService {
                     .processingTimeMs(processingTime)
                     .projectStructureFile(structureFile)
                     .metadataFile(metadataFile)
+                    .estimatedTokenCount(Boolean.TRUE.equals(request.getEstimateTokens()) ? totalTokens : null)
+                    .previewFileTree(asciiTree)
                     .build();
 
         } catch (Exception e) {
@@ -200,14 +236,15 @@ public class ConcatenationService {
      * Scan project directory and collect all matching files.
      * Uses Files.walkFileTree for efficient recursive traversal.
      *
-     * @param projectPath - Root directory to scan
-     * @param excludePatterns - Patterns to exclude (e.g., "*.class", "node_modules/**")
+     * @param projectPath       - Root directory to scan
+     * @param excludePatterns   - Patterns to exclude (e.g., "*.class",
+     *                          "node_modules/**")
      * @param includeExtensions - Extensions to include (e.g., ".java", ".py")
      * @return List of matching file paths
      */
     private List<Path> scanProjectFiles(Path projectPath,
-                                        Set<String> excludePatterns,
-                                        Set<String> includeExtensions) throws IOException {
+            Set<String> excludePatterns,
+            Set<String> includeExtensions) throws IOException {
 
         List<Path> files = new ArrayList<>();
 
@@ -253,7 +290,7 @@ public class ConcatenationService {
      * - "node_modules/**" matches anything under node_modules
      * - "temp?.txt" matches temp1.txt, tempA.txt, etc.
      *
-     * @param path - Path to check
+     * @param path     - Path to check
      * @param patterns - Exclude patterns
      * @return true if path should be excluded
      */
@@ -287,11 +324,11 @@ public class ConcatenationService {
      * README.md → "root" (files in project root)
      *
      * @param projectPath - Project root path
-     * @param files - List of files to group
+     * @param files       - List of files to group
      * @return Map of folder name → list of files
      */
     private Map<String, List<Path>> groupFilesByTopLevelFolder(Path projectPath,
-                                                               List<Path> files) {
+            List<Path> files) {
         Map<String, List<Path>> groups = new HashMap<>();
 
         for (Path file : files) {
@@ -325,34 +362,61 @@ public class ConcatenationService {
      * If files exceed maxFileSizeMb, creates multiple files:
      * foldername-1.txt, foldername-2.txt, etc.
      *
-     * @param files - Files to concatenate
-     * @param projectPath - Project root (for relative paths)
-     * @param outputPath - Where to save output files
-     * @param folderName - Name for output file
+     * @param files         - Files to concatenate
+     * @param projectPath   - Project root (for relative paths)
+     * @param outputPath    - Where to save output files
+     * @param folderName    - Name for output file
      * @param maxFileSizeMb - Maximum size before splitting
      * @return List of generated output file paths
      */
-    private List<String> concatenateFilesWithSplit(List<Path> files,
-                                                   Path projectPath,
-                                                   Path outputPath,
-                                                   String folderName,
-                                                   int maxFileSizeMb) throws IOException {
+    private ConcatenationOutput concatenateFilesWithSplit(List<Path> files,
+            Path projectPath,
+            Path outputPath,
+            String folderName,
+            int maxFileSizeMb,
+            Boolean useXmlTags,
+            String asciiTree) throws IOException {
 
         List<String> outputFiles = new ArrayList<>();
         long maxSizeBytes = maxFileSizeMb * MB_TO_BYTES;
 
         int fileIndex = 1;
         long currentSize = 0;
+        long tokenCount = 0;
         BufferedWriter writer = null;
         Path currentOutputFile = null;
 
         try {
+            // Write Tree to first file if present
+            if (asciiTree != null) {
+                currentOutputFile = outputPath.resolve(folderName + "-" + fileIndex + ".txt");
+                writer = Files.newBufferedWriter(currentOutputFile, StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
+                outputFiles.add(currentOutputFile.toString());
+
+                writer.write("PROJECT FILE TREE:\n");
+                writer.write(asciiTree);
+                writer.write("\n\n");
+                currentSize += asciiTree.length();
+                if (asciiTree != null)
+                    tokenCount += asciiTree.length() / 4;
+            }
+
             for (Path file : files) {
                 String relativePath = projectPath.relativize(file).toString();
                 String fileContent = Files.readString(file);
-                String separator = String.format(FILE_SEPARATOR, relativePath);
 
-                long entrySize = separator.getBytes().length + fileContent.getBytes().length + 2; // +2 for newlines
+                String entryStart;
+                String entryEnd = "\n\n";
+                if (Boolean.TRUE.equals(useXmlTags)) {
+                    entryStart = String.format(XML_FILE_START, relativePath);
+                    entryEnd = XML_FILE_END + "\n";
+                } else {
+                    entryStart = String.format(FILE_SEPARATOR, relativePath);
+                }
+
+                long entrySize = entryStart.getBytes().length + fileContent.getBytes().length
+                        + entryEnd.getBytes().length;
 
                 // Check if we need to create a new output file
                 if (writer == null || (currentSize + entrySize > maxSizeBytes)) {
@@ -373,12 +437,13 @@ public class ConcatenationService {
                     currentSize = 0;
                 }
 
-                // Write file separator and content
-                writer.write(separator);
+                // Write content
+                writer.write(entryStart);
                 writer.write(fileContent);
-                writer.write("\n\n");
+                writer.write(entryEnd);
 
                 currentSize += entrySize;
+                tokenCount += (entrySize / 4); // Rough approx
             }
 
         } finally {
@@ -387,7 +452,28 @@ public class ConcatenationService {
             }
         }
 
-        return outputFiles;
+        return new ConcatenationOutput(outputFiles, tokenCount);
+    }
+
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    private static class ConcatenationOutput {
+        private List<String> filePaths;
+        private long tokenCount;
+    }
+
+    private String generateAsciiTree(Path projectPath, List<Path> files) {
+        // Simple implementation for now - can be improved
+        StringBuilder sb = new StringBuilder();
+        // Sort files to ensure folders come together
+        files.stream().sorted().forEach(path -> {
+            String rel = projectPath.relativize(path).toString();
+            int depth = path.getNameCount() - projectPath.getNameCount();
+            // Basic indentation
+            sb.append("  ".repeat(Math.max(0, depth)));
+            sb.append("- ").append(path.getFileName()).append("\n");
+        });
+        return sb.toString();
     }
 
     /**
@@ -395,25 +481,25 @@ public class ConcatenationService {
      *
      * Format:
      * {
-     *   "projectPath": "/path/to/project",
-     *   "structure": {
-     *     "src": {
-     *       "main": {
-     *         "java": ["App.java", "Controller.java"]
-     *       }
-     *     },
-     *     "README.md": null
-     *   }
+     * "projectPath": "/path/to/project",
+     * "structure": {
+     * "src": {
+     * "main": {
+     * "java": ["App.java", "Controller.java"]
+     * }
+     * },
+     * "README.md": null
+     * }
      * }
      *
      * @param projectPath - Project root
-     * @param files - All files in project
-     * @param outputPath - Where to save structure file
+     * @param files       - All files in project
+     * @param outputPath  - Where to save structure file
      * @return Path to structure file
      */
     private String generateProjectStructure(Path projectPath,
-                                            List<Path> files,
-                                            Path outputPath) throws IOException {
+            List<Path> files,
+            Path outputPath) throws IOException {
 
         Map<String, Object> structure = new HashMap<>();
         structure.put("projectPath", projectPath.toString());
@@ -451,8 +537,7 @@ public class ConcatenationService {
             @SuppressWarnings("unchecked")
             Map<String, Object> subtree = (Map<String, Object>) tree.computeIfAbsent(
                     firstPart,
-                    k -> new HashMap<String, Object>()
-            );
+                    k -> new HashMap<String, Object>());
 
             addToTree(subtree, remaining);
         }

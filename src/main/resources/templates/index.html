@@ -1,385 +1,119 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Concatenator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        button {
-            flex: 1;
-            padding: 14px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-settings {
-            background: #4caf50;
-            color: white;
-            margin-top: 10px;
-        }
-
-        .btn-settings:hover {
-            background: #45a049;
-        }
-
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .result.success {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
-        }
-
-        .result.error {
-            background: #ffebee;
-            border: 2px solid #f44336;
-        }
-
-        .result h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .stat:last-child {
-            border-bottom: none;
-        }
-
-        .stat-label {
-            font-weight: 600;
-            color: #666;
-        }
-
-        .stat-value {
-            color: #333;
-        }
-
-        .output-files {
-            margin-top: 15px;
-        }
-
-        .output-files h4 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .output-files ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .output-files li {
-            padding: 8px;
-            background: #f5f5f5;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .help-text {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/main.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-<div class="container">
-    <h1>🚀 Project Concatenator</h1>
-    <p class="subtitle">Concatenate your project files for AI tools (ChatGPT, Claude, etc.)</p>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fas fa-layer-group"></i> Project Concatenator
+        </a>
+        <div class="nav-links">
+            <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+    </nav>
 
-    <form id="concatenateForm">
-        <div class="form-group">
-            <label for="projectPath">Project Path *</label>
-            <input type="text" id="projectPath" name="projectPath"
-                   placeholder="e.g., C:\Projects\MyApp or /home/user/myapp" required>
-            <p class="help-text">Absolute path to your project directory</p>
+    <div class="container">
+        <!-- Input Section -->
+        <div class="card">
+            <form id="concatenateForm" onsubmit="event.preventDefault(); generateConcatenation(false);">
+                <div class="form-group">
+                    <label for="projectPath">Project Path <span style="color:red">*</span></label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="projectPath" placeholder="e.g. C:\Users\Dev\MyProject" required>
+                        <button type="button" class="btn btn-secondary browse-btn" style="width:auto;"
+                            onclick="browseFolder('projectPath')" title="Browse Folder">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                    </div>
+                    <p id="browseHint" class="help-text" style="display:none; color:#d69e2e;">
+                        <i class="fas fa-info-circle"></i> Check your taskbar for the folder selection window.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="outputFolder">Output Folder Name</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="outputFolder" placeholder="Default: [ProjectName]-Concatenated-Output">
+                        <button type="button" class="btn btn-secondary browse-btn" style="width:auto;"
+                            onclick="browseFolder('outputFolder')" title="Browse Folder">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                    </div>
+                    <p class="help-text">Leave empty to use default. Files are saved here.</p>
+                </div>
+
+                <!-- Docker/Headless Warning -->
+                <div id="dockerHint" class="alert alert-warning"
+                    style="display:none; margin-bottom: 20px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Running in Docker Mode:</strong> Directory browsing is disabled. Please manually enter file
+                    paths relative to the mapped volume (default: <code>/data</code>).
+                </div>
+
+                <div class="form-group">
+                    <label>AI Agent Preferences</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="useXmlTags" checked>
+                            <span>Use XML Tags (Good for Agents)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="includeFileTree" checked>
+                            <span>Include File Tree</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="estimateTokens" checked>
+                            <span>Estimate Token Count</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxFileSizeMb">Split files larger than (MB)</label>
+                    <input type="number" id="maxFileSizeMb" value="30" min="1">
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-bolt"></i> Generate
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="generateConcatenation(true)">
+                        <i class="fas fa-sync"></i> Update
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <div class="form-group">
-            <label for="outputFolder">Output Folder</label>
-            <input type="text" id="outputFolder" name="outputFolder"
-                   placeholder="concatenated-output">
-            <p class="help-text">Folder name for output files (relative to project path)</p>
+        <!-- Output Section -->
+        <div id="resultSection">
+            <!-- Loading State -->
+            <div id="loading" class="loading-overlay card">
+                <div class="spinner"></div>
+                <h3>Processing...</h3>
+                <p>This may take a moment for large projects.</p>
+            </div>
+
+            <!-- Placeholder -->
+            <div id="placeholder" class="card" style="text-align:center; padding:60px; color:#a0aec0;">
+                <i class="fas fa-cube" style="font-size:48px; margin-bottom:20px; color:#cbd5e0;"></i>
+                <p>Enter your project path and click Generate to see results here.</p>
+            </div>
+
+            <!-- Results are injected here by JS -->
+            <div id="result" style="display:none;"></div>
         </div>
-
-        <div class="form-group">
-            <label for="maxFileSizeMb">Max File Size (MB)</label>
-            <input type="number" id="maxFileSizeMb" name="maxFileSizeMb"
-                   placeholder="30" min="1" max="500">
-            <p class="help-text">Files will be split if they exceed this size</p>
-        </div>
-
-        <div class="button-group">
-            <button type="submit" class="btn-primary" data-action="generate">
-                Generate Full
-            </button>
-            <button type="button" class="btn-secondary" onclick="incrementalUpdate()">
-                Incremental Update
-            </button>
-        </div>
-
-        <button type="button" class="btn-settings" onclick="window.location.href='/settings'">
-            ⚙️ Manage Settings
-        </button>
-    </form>
-
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <p>Processing your project...</p>
     </div>
 
-    <div id="result" class="result">
-        <!-- Results will be inserted here -->
-    </div>
-</div>
-
-<script>
-    const form = document.getElementById('concatenateForm');
-    const loading = document.getElementById('loading');
-    const result = document.getElementById('result');
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        generateConcatenation(false);
-    });
-
-    function incrementalUpdate() {
-        generateConcatenation(true);
-    }
-
-    async function generateConcatenation(incremental) {
-        const projectPath = document.getElementById('projectPath').value;
-        const outputFolder = document.getElementById('outputFolder').value;
-        const maxFileSizeMb = document.getElementById('maxFileSizeMb').value;
-
-        if (!projectPath) {
-            alert('Please enter a project path');
-            return;
-        }
-
-        // Show loading
-        loading.style.display = 'block';
-        result.style.display = 'none';
-
-        // Prepare request
-        const requestData = {
-            projectPath: projectPath,
-            outputFolder: outputFolder || null,
-            maxFileSizeMb: maxFileSizeMb ? parseInt(maxFileSizeMb) : null,
-            incrementalUpdate: incremental
-        };
-
-        try {
-            const endpoint = incremental ? '/api/update' : '/api/generate';
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
-            });
-
-            const data = await response.json();
-
-            // Hide loading
-            loading.style.display = 'none';
-
-            // Show result
-            displayResult(data);
-
-        } catch (error) {
-            loading.style.display = 'none';
-            displayError('Network error: ' + error.message);
-        }
-    }
-
-    function displayResult(data) {
-        result.style.display = 'block';
-
-        if (data.success) {
-            result.className = 'result success';
-
-            const processingTimeSec = (data.processingTimeMs / 1000).toFixed(2);
-            const totalSizeMb = (data.totalSizeBytes / (1024 * 1024)).toFixed(2);
-
-            result.innerHTML = `
-                    <h3>✅ Success!</h3>
-                    <div class="stat">
-                        <span class="stat-label">Files Processed:</span>
-                        <span class="stat-value">${data.totalFilesProcessed}</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Files Changed:</span>
-                        <span class="stat-value">${data.filesChanged}</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Files Skipped:</span>
-                        <span class="stat-value">${data.filesSkipped}</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Total Output Size:</span>
-                        <span class="stat-value">${totalSizeMb} MB</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Processing Time:</span>
-                        <span class="stat-value">${processingTimeSec}s</span>
-                    </div>
-
-                    ${data.outputFiles && data.outputFiles.length > 0 ? `
-                        <div class="output-files">
-                            <h4>Output Files:</h4>
-                            <ul>
-                                ${data.outputFiles.map(file => `<li>${file}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                `;
-        } else {
-            result.className = 'result error';
-            result.innerHTML = `
-                    <h3>❌ Error</h3>
-                    <p>${data.message}</p>
-                    ${data.errors && data.errors.length > 0 ? `
-                        <ul>
-                            ${data.errors.map(err => `<li>${err}</li>`).join('')}
-                        </ul>
-                    ` : ''}
-                `;
-        }
-    }
-
-    function displayError(message) {
-        result.style.display = 'block';
-        result.className = 'result error';
-        result.innerHTML = `
-                <h3>❌ Error</h3>
-                <p>${message}</p>
-            `;
-    }
-</script>
+    <script src="/js/main.js"></script>
 </body>
+
 </html>

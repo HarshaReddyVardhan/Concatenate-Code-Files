@@ -1,0 +1,521 @@
+2026-01-10 12:57:48.514 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 12:57:48.570 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Starting ConatenateApplication using Java 21.0.9 with PID 20900 (D:\Project\conatenate\target\classes started by harsh in D:\Project\conatenate)
+2026-01-10 12:57:48.571 DEBUG [restartedMain] com.concatenator.conatenate.ConatenateApplication - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 12:57:48.572 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 12:57:48.625 INFO  [restartedMain] o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-10 12:57:48.630 INFO  [restartedMain] o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-01-10 12:57:50.237 INFO  [restartedMain] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-10 12:57:50.247 INFO  [restartedMain] org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-10 12:57:50.249 INFO  [restartedMain] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-10 12:57:50.249 INFO  [restartedMain] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-01-10 12:57:50.306 INFO  [restartedMain] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-10 12:57:50.306 INFO  [restartedMain] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1675 ms
+2026-01-10 12:57:50.613 INFO  [restartedMain] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 12:57:51.122 INFO  [restartedMain] o.s.b.d.autoconfigure.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-01-10 12:57:51.131 INFO  [restartedMain] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 12:57:51.175 INFO  [restartedMain] org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-10 12:57:51.205 INFO  [restartedMain] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-01-10 12:57:51.219 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Started ConatenateApplication in 3.233 seconds (process running for 4.023)
+2026-01-10 12:57:51.228 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 12:57:51.228 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 12:57:51.228 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 12:57:51.770 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Browser opened successfully
+2026-01-10 12:57:51.981 INFO  [http-nio-8080-exec-1] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-10 12:57:51.981 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-10 12:57:51.983 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2026-01-10 12:57:52.047 INFO  [http-nio-8080-exec-1] c.concatenator.conatenate.controller.WebController - Serving home page
+2026-01-10 12:57:58.454 INFO  [http-nio-8080-exec-4] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 12:57:58.456 INFO  [http-nio-8080-exec-4] c.c.conatenate.controller.UtilsController - Thread: http-nio-8080-exec-4
+2026-01-10 12:57:58.458 INFO  [http-nio-8080-exec-4] c.c.conatenate.controller.UtilsController - Headless check passed - java.awt.headless=false
+2026-01-10 12:57:58.466 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Setting system look and feel
+2026-01-10 12:57:58.534 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Look and feel set successfully: Windows
+2026-01-10 12:57:58.535 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Creating JFileChooser dialog...
+2026-01-10 12:57:59.796 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - File chooser starting directory: C:\Users\harsh
+2026-01-10 12:57:59.797 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Creating parent frame for dialog...
+2026-01-10 12:57:59.847 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Parent frame created with focus - alwaysOnTop: true
+2026-01-10 12:57:59.847 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - >>> Opening folder selection dialog (waiting for user interaction)...
+2026-01-10 12:58:26.015 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - <<< Dialog closed with result code: 0
+2026-01-10 12:58:26.017 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - [SUCCESS] User selected folder: D:\Project\conatenate
+2026-01-10 12:58:26.031 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Parent frame disposed
+2026-01-10 12:58:26.034 INFO  [http-nio-8080-exec-4] c.c.conatenate.controller.UtilsController - === Browse Folder Request Completed in 27580ms ===
+2026-01-10 12:58:26.035 INFO  [http-nio-8080-exec-4] c.c.conatenate.controller.UtilsController - Returning selected path: D:\Project\conatenate
+2026-01-10 12:58:36.195 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.ConcatenationController - Received concatenation request for: D:\Project\conatenate
+2026-01-10 12:58:36.197 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: D:\Project\conatenate
+2026-01-10 12:58:36.197 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.UserSettingsService - Loading user settings from: C:\Users\harsh/.project-concat-settings.json
+2026-01-10 12:58:36.199 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.UserSettingsService - Loaded settings: 41 exclude patterns, 36 include extensions
+2026-01-10 12:58:36.200 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 12:58:36.208 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\hooks
+2026-01-10 12:58:36.210 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\info
+2026-01-10 12:58:36.210 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\logs
+2026-01-10 12:58:36.211 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\objects
+2026-01-10 12:58:36.212 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\refs
+2026-01-10 12:58:36.216 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: .idea\codeStyles
+2026-01-10 12:58:36.253 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: target\classes
+2026-01-10 12:58:36.254 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-sources
+2026-01-10 12:58:36.254 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-test-sources
+2026-01-10 12:58:36.255 DEBUG [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Excluding directory: target\maven-status
+2026-01-10 12:58:36.255 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Found 29 files to process
+2026-01-10 12:58:36.271 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Files to process: 29, Files skipped: 0
+2026-01-10 12:58:36.307 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\OneDrive\Desktop\PROJECT_STRUCTURE.json
+2026-01-10 12:58:36.315 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\OneDrive\Desktop\.project-concat-metadata.json
+2026-01-10 12:58:36.316 INFO  [http-nio-8080-exec-5] c.c.conatenate.service.ConcatenationService - Concatenation completed in 119ms
+2026-01-10 12:58:36.317 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.ConcatenationController - Concatenation successful: 29 files processed
+2026-01-10 12:58:52.484 INFO  [http-nio-8080-exec-7] c.c.conatenate.controller.ConcatenationController - Received incremental update request for: D:\Project\conatenate
+2026-01-10 12:58:52.485 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: D:\Project\conatenate
+2026-01-10 12:58:52.485 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.UserSettingsService - Loading user settings from: C:\Users\harsh/.project-concat-settings.json
+2026-01-10 12:58:52.486 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.UserSettingsService - Loaded settings: 41 exclude patterns, 36 include extensions
+2026-01-10 12:58:52.509 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 12:58:52.511 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\hooks
+2026-01-10 12:58:52.511 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\info
+2026-01-10 12:58:52.512 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\logs
+2026-01-10 12:58:52.512 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\objects
+2026-01-10 12:58:52.515 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\refs
+2026-01-10 12:58:52.518 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: .idea\codeStyles
+2026-01-10 12:58:52.542 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: target\classes
+2026-01-10 12:58:52.542 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-sources
+2026-01-10 12:58:52.542 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-test-sources
+2026-01-10 12:58:52.544 DEBUG [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Excluding directory: target\maven-status
+2026-01-10 12:58:52.544 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Found 29 files to process
+2026-01-10 12:58:52.558 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Files to process: 0, Files skipped: 29
+2026-01-10 12:58:52.559 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\OneDrive\Desktop\PROJECT_STRUCTURE.json
+2026-01-10 12:58:52.561 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\OneDrive\Desktop\.project-concat-metadata.json
+2026-01-10 12:58:52.562 INFO  [http-nio-8080-exec-7] c.c.conatenate.service.ConcatenationService - Concatenation completed in 77ms
+2026-01-10 12:58:52.563 INFO  [http-nio-8080-exec-7] c.c.conatenate.controller.ConcatenationController - Incremental update successful: 0 files changed, 29 skipped
+2026-01-10 13:12:16.996 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 13:12:17.097 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Starting ConatenateApplicationTests using Java 22.0.2 with PID 10752 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:12:17.097 DEBUG [main] c.c.conatenate.ConatenateApplicationTests - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:12:17.097 INFO  [main] c.c.conatenate.ConatenateApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:12:18.385 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:12:18.917 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 13:12:18.981 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Started ConatenateApplicationTests in 2.388 seconds (process running for 3.397)
+2026-01-10 13:12:19.068 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:19.068 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:12:19.068 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:19.175 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:12:20.031 INFO  [main] o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.concatenator.conatenate.controller.UtilsControllerTest]: UtilsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-01-10 13:12:20.077 INFO  [main] o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.concatenator.conatenate.ConatenateApplication for test class com.concatenator.conatenate.controller.UtilsControllerTest
+2026-01-10 13:12:20.083 INFO  [main] o.s.b.devtools.restart.RestartApplicationListener - Restart disabled due to context in which it is running
+2026-01-10 13:12:20.113 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Starting UtilsControllerTest using Java 22.0.2 with PID 10752 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:12:20.113 DEBUG [main] c.c.conatenate.controller.UtilsControllerTest - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:12:20.114 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:12:20.242 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:12:20.291 INFO  [main] o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-01-10 13:12:20.293 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2026-01-10 13:12:20.293 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+2026-01-10 13:12:20.298 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Started UtilsControllerTest in 0.216 seconds (process running for 4.715)
+2026-01-10 13:12:20.299 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:20.299 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:12:20.299 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:20.299 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:12:20.335 INFO  [main] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 13:12:20.335 INFO  [main] c.c.conatenate.controller.UtilsController - Thread: main
+2026-01-10 13:12:20.335 ERROR [main] c.c.conatenate.controller.UtilsController - [HEADLESS_ERROR] Cannot open file chooser: Server is running in headless mode
+2026-01-10 13:12:20.335 ERROR [main] c.c.conatenate.controller.UtilsController - java.awt.headless system property: true
+2026-01-10 13:12:20.680 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564
+2026-01-10 13:12:20.687 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:20.690 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:12:20.695 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:20.707 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:12:20.709 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:20.713 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:12:20.762 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564\out-incremental\.project-concat-metadata.json
+2026-01-10 13:12:20.763 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 83ms
+2026-01-10 13:12:20.891 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564
+2026-01-10 13:12:20.935 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:20.936 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:12:20.937 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:20.938 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 1
+2026-01-10 13:12:20.940 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:20.940 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:12:20.941 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit10286697074143999564\out-incremental\.project-concat-metadata.json
+2026-01-10 13:12:20.941 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 50ms
+2026-01-10 13:12:20.957 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit4270512007645829413
+2026-01-10 13:12:20.959 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:20.960 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: output-folder
+2026-01-10 13:12:20.960 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:20.961 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:20.962 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:20.964 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit4270512007645829413\output-folder\PROJECT_STRUCTURE.json
+2026-01-10 13:12:20.967 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit4270512007645829413\output-folder\.project-concat-metadata.json
+2026-01-10 13:12:20.968 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 11ms
+2026-01-10 13:12:20.979 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit10333823586805087387
+2026-01-10 13:12:20.980 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:20.982 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:12:20.982 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:20.983 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:20.984 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: root-1.txt
+2026-01-10 13:12:20.986 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit10333823586805087387\out\PROJECT_STRUCTURE.json
+2026-01-10 13:12:20.989 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit10333823586805087387\out\.project-concat-metadata.json
+2026-01-10 13:12:20.990 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 11ms
+2026-01-10 13:12:21.005 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit8465441002176270497
+2026-01-10 13:12:21.006 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:21.007 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: Project-Concatenated-Output
+2026-01-10 13:12:21.008 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:21.009 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:21.010 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:21.011 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit8465441002176270497\Project-Concatenated-Output\PROJECT_STRUCTURE.json
+2026-01-10 13:12:21.014 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit8465441002176270497\Project-Concatenated-Output\.project-concat-metadata.json
+2026-01-10 13:12:21.015 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 10ms
+2026-01-10 13:12:21.024 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit7203450696996732956
+2026-01-10 13:12:21.026 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:21.027 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:12:21.027 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:21.028 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:21.031 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit7203450696996732956\out\PROJECT_STRUCTURE.json
+2026-01-10 13:12:21.034 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit7203450696996732956\out\.project-concat-metadata.json
+2026-01-10 13:12:21.035 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 11ms
+2026-01-10 13:12:21.051 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit4234430332693469187
+2026-01-10 13:12:21.052 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:21.053 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-split
+2026-01-10 13:12:21.054 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:21.055 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:12:21.058 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-1.txt
+2026-01-10 13:12:21.075 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-2.txt
+2026-01-10 13:12:21.076 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit4234430332693469187\out-split\PROJECT_STRUCTURE.json
+2026-01-10 13:12:21.080 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit4234430332693469187\out-split\.project-concat-metadata.json
+2026-01-10 13:12:21.080 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 29ms
+2026-01-10 13:12:38.175 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 13:12:38.269 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Starting ConatenateApplicationTests using Java 22.0.2 with PID 19560 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:12:38.270 DEBUG [main] c.c.conatenate.ConatenateApplicationTests - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:12:38.270 INFO  [main] c.c.conatenate.ConatenateApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:12:39.578 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:12:40.097 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 13:12:40.153 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Started ConatenateApplicationTests in 2.425 seconds (process running for 3.424)
+2026-01-10 13:12:40.250 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:40.250 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:12:40.250 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:40.370 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:12:41.300 INFO  [main] o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.concatenator.conatenate.controller.UtilsControllerTest]: UtilsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-01-10 13:12:41.359 INFO  [main] o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.concatenator.conatenate.ConatenateApplication for test class com.concatenator.conatenate.controller.UtilsControllerTest
+2026-01-10 13:12:41.366 INFO  [main] o.s.b.devtools.restart.RestartApplicationListener - Restart disabled due to context in which it is running
+2026-01-10 13:12:41.413 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Starting UtilsControllerTest using Java 22.0.2 with PID 19560 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:12:41.413 DEBUG [main] c.c.conatenate.controller.UtilsControllerTest - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:12:41.414 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:12:41.597 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:12:41.672 INFO  [main] o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-01-10 13:12:41.672 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2026-01-10 13:12:41.673 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
+2026-01-10 13:12:41.680 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Started UtilsControllerTest in 0.313 seconds (process running for 4.95)
+2026-01-10 13:12:41.680 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:41.680 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:12:41.680 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:12:41.680 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:12:41.846 INFO  [main] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 13:12:41.846 INFO  [main] c.c.conatenate.controller.UtilsController - Thread: main
+2026-01-10 13:12:41.847 ERROR [main] c.c.conatenate.controller.UtilsController - [HEADLESS_ERROR] Cannot open file chooser: Server is running in headless mode
+2026-01-10 13:12:41.847 ERROR [main] c.c.conatenate.controller.UtilsController - java.awt.headless system property: true
+2026-01-10 13:12:42.108 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473
+2026-01-10 13:12:42.114 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.117 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:12:42.122 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:42.132 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:12:42.134 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:42.140 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.210 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473\out-incremental\.project-concat-metadata.json
+2026-01-10 13:12:42.211 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 103ms
+2026-01-10 13:12:42.330 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473
+2026-01-10 13:12:42.384 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.385 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:12:42.386 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:42.387 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 1
+2026-01-10 13:12:42.388 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:42.389 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.389 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit11691050538335848473\out-incremental\.project-concat-metadata.json
+2026-01-10 13:12:42.389 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 59ms
+2026-01-10 13:12:42.406 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit5862765083639315186
+2026-01-10 13:12:42.407 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.408 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: output-folder
+2026-01-10 13:12:42.408 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:42.409 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:42.410 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:42.412 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit5862765083639315186\output-folder\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.414 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit5862765083639315186\output-folder\.project-concat-metadata.json
+2026-01-10 13:12:42.415 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 9ms
+2026-01-10 13:12:42.426 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit11046858595692303912
+2026-01-10 13:12:42.427 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.429 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:12:42.429 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:42.430 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:42.431 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: root-1.txt
+2026-01-10 13:12:42.432 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit11046858595692303912\out\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.437 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit11046858595692303912\out\.project-concat-metadata.json
+2026-01-10 13:12:42.438 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 13ms
+2026-01-10 13:12:42.451 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit13099372931072552000
+2026-01-10 13:12:42.452 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.452 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: Project-Concatenated-Output
+2026-01-10 13:12:42.453 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:42.454 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:42.456 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:12:42.457 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit13099372931072552000\Project-Concatenated-Output\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.459 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit13099372931072552000\Project-Concatenated-Output\.project-concat-metadata.json
+2026-01-10 13:12:42.460 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 10ms
+2026-01-10 13:12:42.471 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit4525666767842502011
+2026-01-10 13:12:42.472 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.472 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:12:42.473 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:12:42.474 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:12:42.478 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit4525666767842502011\out\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.480 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit4525666767842502011\out\.project-concat-metadata.json
+2026-01-10 13:12:42.481 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 11ms
+2026-01-10 13:12:42.499 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit17590175753306972259
+2026-01-10 13:12:42.500 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:12:42.502 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-split
+2026-01-10 13:12:42.503 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:12:42.504 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:12:42.506 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-1.txt
+2026-01-10 13:12:42.519 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-2.txt
+2026-01-10 13:12:42.522 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit17590175753306972259\out-split\PROJECT_STRUCTURE.json
+2026-01-10 13:12:42.525 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit17590175753306972259\out-split\.project-concat-metadata.json
+2026-01-10 13:12:42.525 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 26ms
+2026-01-10 13:14:37.760 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 13:14:37.850 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Starting ConatenateApplicationTests using Java 22.0.2 with PID 30552 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:14:37.850 DEBUG [main] c.c.conatenate.ConatenateApplicationTests - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:14:37.852 INFO  [main] c.c.conatenate.ConatenateApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:14:39.334 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:14:39.924 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 13:14:40.003 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Started ConatenateApplicationTests in 2.721 seconds (process running for 3.871)
+2026-01-10 13:14:40.117 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:14:40.117 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:14:40.117 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:14:40.225 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:14:41.140 INFO  [main] o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.concatenator.conatenate.controller.UtilsControllerTest]: UtilsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-01-10 13:14:41.186 INFO  [main] o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.concatenator.conatenate.ConatenateApplication for test class com.concatenator.conatenate.controller.UtilsControllerTest
+2026-01-10 13:14:41.194 INFO  [main] o.s.b.devtools.restart.RestartApplicationListener - Restart disabled due to context in which it is running
+2026-01-10 13:14:41.242 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Starting UtilsControllerTest using Java 22.0.2 with PID 30552 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:14:41.243 DEBUG [main] c.c.conatenate.controller.UtilsControllerTest - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:14:41.243 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:14:41.440 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:14:41.525 INFO  [main] o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-01-10 13:14:41.525 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2026-01-10 13:14:41.526 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
+2026-01-10 13:14:41.538 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Started UtilsControllerTest in 0.344 seconds (process running for 5.407)
+2026-01-10 13:14:41.539 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:14:41.539 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:14:41.539 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:14:41.539 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:14:41.688 INFO  [main] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 13:14:41.688 INFO  [main] c.c.conatenate.controller.UtilsController - Thread: main
+2026-01-10 13:14:41.689 ERROR [main] c.c.conatenate.controller.UtilsController - [HEADLESS_ERROR] Cannot open file chooser: Server is running in headless mode
+2026-01-10 13:14:41.689 ERROR [main] c.c.conatenate.controller.UtilsController - java.awt.headless system property: true
+2026-01-10 13:14:41.963 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676
+2026-01-10 13:14:41.968 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:41.970 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:14:41.975 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:14:41.985 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:14:41.987 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:14:41.991 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.042 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676\out-incremental\.project-concat-metadata.json
+2026-01-10 13:14:42.043 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 80ms
+2026-01-10 13:14:42.160 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676
+2026-01-10 13:14:42.221 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.222 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:14:42.224 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:14:42.226 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 1
+2026-01-10 13:14:42.227 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:14:42.228 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.229 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit9491973345162942676\out-incremental\.project-concat-metadata.json
+2026-01-10 13:14:42.230 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 70ms
+2026-01-10 13:14:42.267 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit4529669479261875787
+2026-01-10 13:14:42.269 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.270 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: output-folder
+2026-01-10 13:14:42.272 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:14:42.273 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:14:42.274 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:14:42.277 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit4529669479261875787\output-folder\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.281 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit4529669479261875787\output-folder\.project-concat-metadata.json
+2026-01-10 13:14:42.281 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 14ms
+2026-01-10 13:14:42.295 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit18318344344401653647
+2026-01-10 13:14:42.296 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.299 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:14:42.299 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:14:42.301 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:14:42.302 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: root-1.txt
+2026-01-10 13:14:42.304 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit18318344344401653647\out\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.308 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit18318344344401653647\out\.project-concat-metadata.json
+2026-01-10 13:14:42.310 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 15ms
+2026-01-10 13:14:42.326 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit18446616587746425454
+2026-01-10 13:14:42.328 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.329 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: Project-Concatenated-Output
+2026-01-10 13:14:42.330 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:14:42.331 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:14:42.333 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:14:42.335 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit18446616587746425454\Project-Concatenated-Output\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.338 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit18446616587746425454\Project-Concatenated-Output\.project-concat-metadata.json
+2026-01-10 13:14:42.338 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 12ms
+2026-01-10 13:14:42.351 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit14035995537040324818
+2026-01-10 13:14:42.352 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.354 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:14:42.355 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:14:42.355 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:14:42.360 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit14035995537040324818\out\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.364 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit14035995537040324818\out\.project-concat-metadata.json
+2026-01-10 13:14:42.365 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 14ms
+2026-01-10 13:14:42.384 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit15490335255111223231
+2026-01-10 13:14:42.385 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:14:42.386 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-split
+2026-01-10 13:14:42.386 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:14:42.388 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:14:42.390 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-1.txt
+2026-01-10 13:14:42.412 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-2.txt
+2026-01-10 13:14:42.413 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit15490335255111223231\out-split\PROJECT_STRUCTURE.json
+2026-01-10 13:14:42.416 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit15490335255111223231\out-split\.project-concat-metadata.json
+2026-01-10 13:14:42.417 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 33ms
+2026-01-10 13:16:12.548 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 13:16:12.649 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Starting ConatenateApplicationTests using Java 22.0.2 with PID 13144 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:16:12.649 DEBUG [main] c.c.conatenate.ConatenateApplicationTests - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:16:12.650 INFO  [main] c.c.conatenate.ConatenateApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:16:14.020 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:16:14.498 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 13:16:14.557 INFO  [main] c.c.conatenate.ConatenateApplicationTests - Started ConatenateApplicationTests in 2.414 seconds (process running for 3.425)
+2026-01-10 13:16:14.650 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:16:14.651 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:16:14.651 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:16:14.759 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:16:15.641 INFO  [main] o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.concatenator.conatenate.controller.UtilsControllerTest]: UtilsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-01-10 13:16:15.721 INFO  [main] o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.concatenator.conatenate.ConatenateApplication for test class com.concatenator.conatenate.controller.UtilsControllerTest
+2026-01-10 13:16:15.730 INFO  [main] o.s.b.devtools.restart.RestartApplicationListener - Restart disabled due to context in which it is running
+2026-01-10 13:16:15.756 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Starting UtilsControllerTest using Java 22.0.2 with PID 13144 (started by harsh in D:\Project\conatenate)
+2026-01-10 13:16:15.756 DEBUG [main] c.c.conatenate.controller.UtilsControllerTest - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:16:15.756 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:16:15.924 INFO  [main] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:16:15.990 INFO  [main] o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-01-10 13:16:15.992 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2026-01-10 13:16:15.993 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
+2026-01-10 13:16:15.999 INFO  [main] c.c.conatenate.controller.UtilsControllerTest - Started UtilsControllerTest in 0.271 seconds (process running for 4.867)
+2026-01-10 13:16:15.999 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:16:16.000 INFO  [main] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:16:16.000 INFO  [main] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:16:16.000 WARN  [main] com.concatenator.conatenate.ConatenateApplication - Desktop not supported, please open browser manually
+2026-01-10 13:16:16.134 INFO  [main] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 13:16:16.134 INFO  [main] c.c.conatenate.controller.UtilsController - Thread: main
+2026-01-10 13:16:16.134 ERROR [main] c.c.conatenate.controller.UtilsController - [HEADLESS_ERROR] Cannot open file chooser: Server is running in headless mode
+2026-01-10 13:16:16.134 ERROR [main] c.c.conatenate.controller.UtilsController - java.awt.headless system property: true
+2026-01-10 13:16:16.381 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684
+2026-01-10 13:16:16.388 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.391 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:16:16.399 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:16:16.412 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:16:16.413 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:16:16.417 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.472 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684\out-incremental\.project-concat-metadata.json
+2026-01-10 13:16:16.472 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 91ms
+2026-01-10 13:16:16.592 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684
+2026-01-10 13:16:16.644 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.645 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-incremental
+2026-01-10 13:16:16.646 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:16:16.648 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 1
+2026-01-10 13:16:16.649 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:16:16.651 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684\out-incremental\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.652 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit466525560335797684\out-incremental\.project-concat-metadata.json
+2026-01-10 13:16:16.652 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 60ms
+2026-01-10 13:16:16.673 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit4297299706943028189
+2026-01-10 13:16:16.674 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.675 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: output-folder
+2026-01-10 13:16:16.676 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:16:16.677 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:16:16.679 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:16:16.680 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit4297299706943028189\output-folder\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.685 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit4297299706943028189\output-folder\.project-concat-metadata.json
+2026-01-10 13:16:16.685 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 12ms
+2026-01-10 13:16:16.696 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit10000738214092934116
+2026-01-10 13:16:16.696 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.700 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:16:16.701 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:16:16.702 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:16:16.703 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: root-1.txt
+2026-01-10 13:16:16.705 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit10000738214092934116\out\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.709 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit10000738214092934116\out\.project-concat-metadata.json
+2026-01-10 13:16:16.710 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 14ms
+2026-01-10 13:16:16.725 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit15531054623867158447
+2026-01-10 13:16:16.726 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.727 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: Project-Concatenated-Output
+2026-01-10 13:16:16.728 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:16:16.728 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:16:16.730 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: src-1.txt
+2026-01-10 13:16:16.731 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit15531054623867158447\Project-Concatenated-Output\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.735 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit15531054623867158447\Project-Concatenated-Output\.project-concat-metadata.json
+2026-01-10 13:16:16.735 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 10ms
+2026-01-10 13:16:16.748 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit3146600326659961286
+2026-01-10 13:16:16.750 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.750 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out
+2026-01-10 13:16:16.751 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 1 files to process
+2026-01-10 13:16:16.752 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 1, Files skipped: 0
+2026-01-10 13:16:16.755 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit3146600326659961286\out\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.758 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit3146600326659961286\out\.project-concat-metadata.json
+2026-01-10 13:16:16.759 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 11ms
+2026-01-10 13:16:16.783 INFO  [main] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: C:\Users\harsh\AppData\Local\Temp\junit12279135224065892996
+2026-01-10 13:16:16.784 INFO  [main] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:16:16.785 DEBUG [main] c.c.conatenate.service.ConcatenationService - Excluding directory: out-split
+2026-01-10 13:16:16.785 INFO  [main] c.c.conatenate.service.ConcatenationService - Found 2 files to process
+2026-01-10 13:16:16.786 INFO  [main] c.c.conatenate.service.ConcatenationService - Files to process: 2, Files skipped: 0
+2026-01-10 13:16:16.790 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-1.txt
+2026-01-10 13:16:16.820 INFO  [main] c.c.conatenate.service.ConcatenationService - Created output file: heavy-2.txt
+2026-01-10 13:16:16.821 INFO  [main] c.c.conatenate.service.ConcatenationService - Generated project structure: C:\Users\harsh\AppData\Local\Temp\junit12279135224065892996\out-split\PROJECT_STRUCTURE.json
+2026-01-10 13:16:16.823 INFO  [main] c.c.conatenate.service.ConcatenationService - Saved metadata: C:\Users\harsh\AppData\Local\Temp\junit12279135224065892996\out-split\.project-concat-metadata.json
+2026-01-10 13:16:16.824 INFO  [main] c.c.conatenate.service.ConcatenationService - Concatenation completed in 41ms
+2026-01-10 13:17:31.850 INFO  [background-preinit] org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-01-10 13:17:31.908 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Starting ConatenateApplication using Java 21.0.9 with PID 30768 (D:\Project\conatenate\target\classes started by harsh in D:\Project\conatenate)
+2026-01-10 13:17:31.908 DEBUG [restartedMain] com.concatenator.conatenate.ConatenateApplication - Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-01-10 13:17:31.910 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-10 13:17:31.967 INFO  [restartedMain] o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-10 13:17:31.967 INFO  [restartedMain] o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-01-10 13:17:33.515 INFO  [restartedMain] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-10 13:17:33.525 INFO  [restartedMain] org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-10 13:17:33.527 INFO  [restartedMain] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-10 13:17:33.528 INFO  [restartedMain] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-01-10 13:17:33.583 INFO  [restartedMain] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-10 13:17:33.583 INFO  [restartedMain] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1616 ms
+2026-01-10 13:17:33.835 INFO  [Thread-4] c.c.conatenate.controller.UtilsController - Initializing Swing components for faster first-time load...
+2026-01-10 13:17:33.917 INFO  [restartedMain] o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page template: index
+2026-01-10 13:17:34.483 INFO  [restartedMain] o.s.b.d.autoconfigure.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-01-10 13:17:34.491 INFO  [restartedMain] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-10 13:17:34.546 INFO  [restartedMain] org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-10 13:17:34.577 INFO  [restartedMain] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-01-10 13:17:34.596 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Started ConatenateApplication in 3.326 seconds (process running for 4.095)
+2026-01-10 13:17:34.607 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:17:34.608 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Application ready at: http://localhost:8080
+2026-01-10 13:17:34.608 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - =================================================
+2026-01-10 13:17:35.020 INFO  [restartedMain] com.concatenator.conatenate.ConatenateApplication - Browser opened successfully
+2026-01-10 13:17:35.221 INFO  [http-nio-8080-exec-1] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-10 13:17:35.222 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-10 13:17:35.225 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-01-10 13:17:35.301 INFO  [http-nio-8080-exec-1] c.concatenator.conatenate.controller.WebController - Serving home page
+2026-01-10 13:17:35.789 INFO  [Thread-4] c.c.conatenate.controller.UtilsController - Swing initialization complete.
+2026-01-10 13:17:43.216 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.UtilsController - === Browse Folder Request Started ===
+2026-01-10 13:17:43.217 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.UtilsController - Thread: http-nio-8080-exec-5
+2026-01-10 13:17:43.218 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.UtilsController - Headless check passed - java.awt.headless=false
+2026-01-10 13:17:43.220 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Creating JFileChooser dialog...
+2026-01-10 13:17:43.544 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - File chooser starting directory: C:\Users\harsh
+2026-01-10 13:17:43.544 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Creating parent frame for dialog...
+2026-01-10 13:17:43.602 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Parent frame created with focus - alwaysOnTop: true
+2026-01-10 13:17:43.602 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - >>> Opening folder selection dialog (waiting for user interaction)...
+2026-01-10 13:18:12.460 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - <<< Dialog closed with result code: 0
+2026-01-10 13:18:12.461 INFO  [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - [SUCCESS] User selected folder: D:\Project\conatenate
+2026-01-10 13:18:12.479 DEBUG [AWT-EventQueue-0] c.c.conatenate.controller.UtilsController - Parent frame disposed
+2026-01-10 13:18:12.480 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.UtilsController - === Browse Folder Request Completed in 29263ms ===
+2026-01-10 13:18:12.482 INFO  [http-nio-8080-exec-5] c.c.conatenate.controller.UtilsController - Returning selected path: D:\Project\conatenate
+2026-01-10 13:18:15.353 INFO  [http-nio-8080-exec-6] c.c.conatenate.controller.ConcatenationController - Received concatenation request for: D:\Project\conatenate
+2026-01-10 13:18:15.354 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Starting concatenation for project: D:\Project\conatenate
+2026-01-10 13:18:15.354 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.UserSettingsService - Loading user settings from: C:\Users\harsh/.project-concat-settings.json
+2026-01-10 13:18:15.359 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.UserSettingsService - Loaded settings: 41 exclude patterns, 36 include extensions
+2026-01-10 13:18:15.360 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Scanning project files...
+2026-01-10 13:18:15.370 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\hooks
+2026-01-10 13:18:15.371 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\info
+2026-01-10 13:18:15.371 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\logs
+2026-01-10 13:18:15.372 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\objects
+2026-01-10 13:18:15.373 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .git\refs
+2026-01-10 13:18:15.380 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: .idea\codeStyles
+2026-01-10 13:18:15.390 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: conatenate-Concatenated-Output
+2026-01-10 13:18:15.425 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\classes
+2026-01-10 13:18:15.426 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-sources
+2026-01-10 13:18:15.427 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\generated-test-sources
+2026-01-10 13:18:15.428 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\maven-archiver
+2026-01-10 13:18:15.430 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\maven-status
+2026-01-10 13:18:15.430 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\surefire-reports
+2026-01-10 13:18:15.431 DEBUG [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Excluding directory: target\test-classes
+2026-01-10 13:18:15.433 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Found 31 files to process
+2026-01-10 13:18:15.453 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Files to process: 31, Files skipped: 0
+2026-01-10 13:18:15.511 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Generated project structure: D:\Project\conatenate\conatenate-Concatenated-Output\PROJECT_STRUCTURE.json
+2026-01-10 13:18:15.522 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Saved metadata: D:\Project\conatenate\conatenate-Concatenated-Output\.project-concat-metadata.json
+2026-01-10 13:18:15.522 INFO  [http-nio-8080-exec-6] c.c.conatenate.service.ConcatenationService - Concatenation completed in 168ms
+2026-01-10 13:18:15.524 INFO  [http-nio-8080-exec-6] c.c.conatenate.controller.ConcatenationController - Concatenation successful: 31 files processed
