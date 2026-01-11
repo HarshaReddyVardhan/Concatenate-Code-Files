@@ -73,8 +73,9 @@ class ConcatenationServiceTest {
         // Verify success
         assertTrue(result.getSuccess());
 
-        // Check metadata file location
-        Path outputDir = tempDir.resolve("output-folder");
+        // Check metadata file location - now inside the _Concatenated_Output subfolder
+        String projectName = tempDir.getFileName().toString();
+        Path outputDir = tempDir.resolve("output-folder").resolve(projectName + "_Concatenated_Output");
         Path metadataFile = outputDir.resolve(".project-concat-metadata.json");
         assertTrue(Files.exists(metadataFile), "Metadata file should exist in output folder");
 
@@ -110,6 +111,9 @@ class ConcatenationServiceTest {
         ConcatenationResult result = concatenationService.generateConcatenation(request);
 
         assertTrue(result.getSuccess());
+        // Note: The stale file in outputFolderName won't be concatenated since the
+        // actual output goes to
+        // outputFolderName/ProjectName_Concatenated_Output/
         assertEquals(1, result.getTotalFilesProcessed(), "Should only process 1 file (RealCode.java)");
 
         // Verify output matches expectation
@@ -140,8 +144,9 @@ class ConcatenationServiceTest {
         assertNotNull(result.getEstimatedTokenCount());
         assertNotNull(result.getPreviewFileTree());
 
-        // Check content
-        Path outputFile = tempDir.resolve("out").resolve("src-1.txt");
+        // Check content - now inside the _Concatenated_Output subfolder
+        String projectName = tempDir.getFileName().toString();
+        Path outputFile = tempDir.resolve("out").resolve(projectName + "_Concatenated_Output").resolve("src-1.txt");
         String content = Files.readString(outputFile);
 
         assertTrue(content.contains("PROJECT FILE TREE:"), "Should contain file tree header");
@@ -187,7 +192,7 @@ class ConcatenationServiceTest {
 
         ConcatenationResult result2 = concatenationService.generateConcatenation(requestInc);
 
-        assertTrue(result2.getSuccess());
+        assertTrue(result2.getSuccess(), "Incremental update failed: " + result2.getMessage());
         // Should process 1 (modified), skip 1
         assertEquals(1, result2.getFilesChanged(), "Should detect 1 changed file");
         assertEquals(1, result2.getFilesSkipped(), "Should skip 1 unchanged file");
@@ -269,7 +274,9 @@ class ConcatenationServiceTest {
         // Actually, logic splits when `currentSize + entrySize > maxSizeBytes`.
         // BigFile alone > 1MB, so it might take one file. SmallFile might go to next.
 
-        long outputCount = Files.list(tempDir.resolve("out-split"))
+        String projectName = tempDir.getFileName().toString();
+        Path actualOutputDir = tempDir.resolve("out-split").resolve(projectName + "_Concatenated_Output");
+        long outputCount = Files.list(actualOutputDir)
                 .filter(p -> p.toString().endsWith(".txt"))
                 .count();
 
@@ -313,8 +320,9 @@ class ConcatenationServiceTest {
 
         assertTrue(result.getSuccess());
 
-        // Gather all output content
-        Path outputDir = tempDir.resolve("output");
+        // Gather all output content - now inside the _Concatenated_Output subfolder
+        String projectName = tempDir.getFileName().toString();
+        Path outputDir = tempDir.resolve("output").resolve(projectName + "_Concatenated_Output");
         StringBuilder allContent = new StringBuilder();
         for (String file : result.getOutputFiles()) {
             allContent.append(Files.readString(Path.of(file)));
@@ -334,5 +342,91 @@ class ConcatenationServiceTest {
 
         // Verify old metadata is EXCLUDED from the output content
         assertFalse(content.contains("\"old\":\"metadata\""), "Metadata file should be excluded from output");
+    }
+
+    @Test
+    void testAbsolutePathCreatesSubfolder() throws IOException {
+        // Scenario: User selects an absolute path (e.g. C:\Users\User\Desktop)
+        // We expect the service to create a subfolder "ProjectName_Concatenated_Output"
+        // inside it.
+
+        Path externalDir = tempDir.resolve("external-location");
+        Files.createDirectories(externalDir);
+
+        Path src = tempDir.resolve("src");
+        Files.createDirectories(src);
+        Files.writeString(src.resolve("Code.java"), "class Code {}");
+
+        ConcatenationRequest request = ConcatenationRequest.builder()
+                .projectPath(tempDir.toString())
+                .outputFolder(externalDir.toAbsolutePath().toString()) // Absolute path
+                .includeExtensions(new HashSet<>(Collections.singletonList(".java")))
+                .build();
+
+        ConcatenationResult result = concatenationService.generateConcatenation(request);
+
+        assertTrue(result.getSuccess());
+
+        // Check that files were NOT created directly in externalDir
+        long filesInRoot = Files.list(externalDir).filter(Files::isRegularFile).count();
+        assertEquals(0, filesInRoot, "Should not create files directly in the absolute path root");
+
+        // Check that subfolder was created
+        // Name depends on tempDir name, so we check for folder ending with
+        // _Concatenated_Output
+        String expectedSuffix = "_Concatenated_Output";
+        // Or strictly: tempDir_Concatenated_Output
+        String folderName = tempDir.getFileName().toString() + "_Concatenated_Output";
+        Path expectedSubfolder = externalDir.resolve(folderName);
+
+        assertTrue(Files.exists(expectedSubfolder), "Should create subfolder " + folderName);
+        assertTrue(Files.isDirectory(expectedSubfolder));
+
+        // Check files are inside
+        assertTrue(Files.list(expectedSubfolder).findAny().isPresent(), "Subfolder should contain output files");
+    }
+
+    @Test
+    void testRelativePathCreatesSubfolder() throws IOException {
+        // BUG FIX TEST: When user provides a relative path (e.g., "my-output"),
+        // the service should create the _Concatenated_Output subfolder inside it.
+        // Before fix: files were placed directly in the relative folder.
+        // After fix: files are placed in
+        // relative-folder/ProjectName_Concatenated_Output/
+
+        Path src = tempDir.resolve("src");
+        Files.createDirectories(src);
+        Files.writeString(src.resolve("App.java"), "class App {}");
+
+        String relativeOutputFolder = "custom-output-folder";
+        ConcatenationRequest request = ConcatenationRequest.builder()
+                .projectPath(tempDir.toString())
+                .outputFolder(relativeOutputFolder) // Relative path
+                .includeExtensions(new HashSet<>(Collections.singletonList(".java")))
+                .build();
+
+        ConcatenationResult result = concatenationService.generateConcatenation(request);
+
+        assertTrue(result.getSuccess());
+
+        // Check that the _Concatenated_Output subfolder was created
+        String projectName = tempDir.getFileName().toString();
+        Path expectedSubfolder = tempDir.resolve(relativeOutputFolder).resolve(projectName + "_Concatenated_Output");
+
+        assertTrue(Files.exists(expectedSubfolder),
+                "Should create subfolder " + projectName + "_Concatenated_Output inside " + relativeOutputFolder);
+        assertTrue(Files.isDirectory(expectedSubfolder));
+
+        // Check files are inside the subfolder, not directly in the relative folder
+        assertTrue(Files.list(expectedSubfolder).findAny().isPresent(),
+                "Subfolder should contain output files");
+
+        // Verify that files are NOT directly in the custom-output-folder root
+        Path customOutputFolder = tempDir.resolve(relativeOutputFolder);
+        long filesDirectlyInRoot = Files.list(customOutputFolder)
+                .filter(Files::isRegularFile)
+                .count();
+        assertEquals(0, filesDirectlyInRoot,
+                "Files should NOT be placed directly in the relative output folder root");
     }
 }

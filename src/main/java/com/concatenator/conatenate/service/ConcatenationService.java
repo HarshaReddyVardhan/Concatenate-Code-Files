@@ -94,31 +94,42 @@ public class ConcatenationService {
                     request.getIncludeExtensions(),
                     userSettings.getIncludeExtensions());
 
-            String outputFolder = request.getOutputFolder();
-            if (outputFolder == null || outputFolder.trim().isEmpty()) {
-                // Default format: ProjectName-Concatenated-Output
-                String projectName = projectPath.getFileName().toString();
-                outputFolder = projectName + "-Concatenated-Output";
+            String outputFolderRequest = request.getOutputFolder();
+            String defaultFolderName = projectPath.getFileName().toString() + "_Concatenated_Output";
+            Path outputPath;
+
+            if (outputFolderRequest == null || outputFolderRequest.trim().isEmpty()) {
+                // Default: create the output folder inside the project directory
+                outputPath = projectPath.resolve(defaultFolderName);
+            } else {
+                Path providedPath = Paths.get(outputFolderRequest);
+                if (providedPath.isAbsolute()) {
+                    // Absolute path: create the subfolder inside the specified directory
+                    outputPath = providedPath.resolve(defaultFolderName);
+                } else {
+                    // Relative path: resolve relative to project, then create subfolder inside
+                    outputPath = projectPath.resolve(outputFolderRequest).resolve(defaultFolderName);
+                }
             }
-            // else use the provided folder
 
             int maxFileSizeMb = request.getMaxFileSizeMb() != null
                     ? request.getMaxFileSizeMb()
                     : userSettings.getDefaultMaxFileSizeMb();
 
-            // Step 3: Create output directory (MOVED UP FOR BUG FIX)
-            Path outputPath = projectPath.resolve(outputFolder);
             Files.createDirectories(outputPath);
 
-            // Step 4: Load previous metadata (for incremental updates) - Uses outputPath
+            // Step 4: Load previous metadata (for incremental updates)
             // now
             ProjectMetadata previousMetadata = loadMetadata(outputPath);
             boolean isIncremental = Boolean.TRUE.equals(request.getIncrementalUpdate())
                     && previousMetadata != null;
 
             // FIX: Add output folder to exclude patterns PRE-SCAN
-            excludePatterns.add(outputFolder);
-            excludePatterns.add(outputFolder + "/**");
+            if (outputPath.startsWith(projectPath)) {
+                String relativeOut = projectPath.relativize(outputPath).toString();
+                excludePatterns.add(relativeOut);
+                excludePatterns.add(relativeOut + "/**");
+            }
             // Add default exclusions for build artifacts and dependencies
             excludePatterns.addAll(DEFAULT_EXCLUDE_PATTERNS);
             // Exclude the metadata file itself
@@ -597,6 +608,19 @@ public class ConcatenationService {
      */
     private String saveMetadata(Path projectPath, ProjectMetadata metadata) throws IOException {
         Path metadataPath = projectPath.resolve(METADATA_FILE_NAME);
+
+        // If file exists and is hidden, unhide it before writing (otherwise Access
+        // Denied on Windows)
+        if (Files.exists(metadataPath)) {
+            try {
+                DosFileAttributeView dosView = Files.getFileAttributeView(metadataPath, DosFileAttributeView.class);
+                if (dosView != null && dosView.readAttributes().isHidden()) {
+                    dosView.setHidden(false);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to unhide metadata file before writing: {}", e.getMessage());
+            }
+        }
 
         objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(metadataPath.toFile(), metadata);
