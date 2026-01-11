@@ -12,6 +12,10 @@ import java.awt.*;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/utils")
@@ -150,5 +154,31 @@ public class UtilsController {
             log.info("Returning empty response (user cancelled)");
             return ResponseEntity.ok(Collections.emptyMap());
         }
+    }
+
+    @GetMapping("/list-dirs")
+    public ResponseEntity<List<Map<String, Object>>> listDirectories(@RequestParam(required = false) String path) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        File[] files;
+
+        if (path == null || path.trim().isEmpty()) {
+            files = File.listRoots();
+        } else {
+            files = new File(path).listFiles();
+        }
+
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory() && !f.isHidden()) {
+                    result.add(Map.of(
+                            "name", f.getName().isEmpty() ? f.getAbsolutePath() : f.getName(),
+                            "path", f.getAbsolutePath()));
+                }
+            }
+        }
+
+        result.sort(Comparator.comparing(m -> ((String) m.get("name")).toLowerCase()));
+
+        return ResponseEntity.ok(result);
     }
 }

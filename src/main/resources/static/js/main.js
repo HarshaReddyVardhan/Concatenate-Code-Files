@@ -12,24 +12,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check environment (Docker/Headless)
     checkEnvironment();
+
+    // Modal Event Listeners
+    document.querySelector('.close-modal')?.addEventListener('click', closeFolderModal);
+    document.getElementById('modalCancelBtn')?.addEventListener('click', closeFolderModal);
+    document.getElementById('modalSelectBtn')?.addEventListener('click', confirmFolderSelection);
 });
+
+let envState = { isDocker: false, isHeadless: false };
+let currentTargetInputId = null;
+let currentBrowsePath = "/"; // Default start path for Docker
 
 async function checkEnvironment() {
     try {
         const response = await fetch('/api/utils/env-info');
         if (response.ok) {
             const env = await response.json();
-            // If Docker or Headless, hide browse buttons and show hint
+            envState = env;
+            
+            console.log("Environment state:", envState);
+
             if (env.isDocker || env.isHeadless) {
-                const browseBtns = document.querySelectorAll('.browse-btn');
-                browseBtns.forEach(btn => btn.style.display = 'none');
-
-                const dockerHint = document.getElementById('dockerHint');
-                if (dockerHint) dockerHint.style.display = 'block';
-
-                // Hide the taskbar hint message as well since it's irrelevant
-                const browseHint = document.getElementById('browseHint');
-                if (browseHint) browseHint.style.display = 'none'; // Ensure it stays hidden
+                 // Update placeholder to indicate Docker path format
+                 const pathInput = document.getElementById('projectPath');
+                 if (pathInput) pathInput.placeholder = "e.g. /workspace or /host/c/Projects...";
             }
         }
     } catch (e) {
@@ -42,46 +48,47 @@ document.getElementById('projectPath')?.addEventListener('input', (e) => {
     sessionStorage.setItem('projectPath', e.target.value);
 });
 
-// Handle Folder Selection with taskbar hint parameter
+// Handle Folder Selection
 async function browseFolder(targetInputId) {
-    // If no ID provided, default to projectPath for backward compatibility (though we updated calls)
     if (!targetInputId) targetInputId = 'projectPath';
+    currentTargetInputId = targetInputId;
 
+    if (envState.isDocker || envState.isHeadless) {
+        // Use Web-Based Picker for Docker/Headless
+        openFolderModal();
+    } else {
+        // Use Native Swing Picker for Local Desktop
+        await browseNativeFolder(targetInputId);
+    }
+}
+
+async function browseNativeFolder(targetInputId) {
     const hintElement = document.getElementById('browseHint');
-    // Find the specific button that triggered this to show spinner
-    // We assume the button is the one with the onclick that matches or we can find it relative to input
-    // Simpler: just find the button that calls this function with this arg
     const browseBtn = document.querySelector(`button[onclick*="'${targetInputId}'"]`);
-
     let hintTimeout = null;
 
     try {
-        // Disable button while waiting
         if (browseBtn) {
             browseBtn.disabled = true;
             browseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         }
 
-        // Show hint after 2 seconds if dialog hasn't returned
         hintTimeout = setTimeout(() => {
             if (hintElement) {
                 hintElement.style.display = 'block';
                 hintElement.classList.add('pulse-animation');
             }
-            // Also show a non-blocking toast notification
             showNotification('Please check your taskbar for the folder selection window.', 'warning');
         }, 2000);
 
         const response = await fetch('/api/utils/browse-folder');
 
-        // Clear the timeout since we got a response
         clearTimeout(hintTimeout);
         if (hintElement) {
             hintElement.style.display = 'none';
             hintElement.classList.remove('pulse-animation');
         }
 
-        // Restore button
         if (browseBtn) {
             browseBtn.disabled = false;
             browseBtn.innerHTML = '<i class="fas fa-folder-open"></i>';
@@ -93,33 +100,123 @@ async function browseFolder(targetInputId) {
                 const pathInput = document.getElementById(targetInputId);
                 if (pathInput) {
                     pathInput.value = data.path;
-                    // Trigger input event to save to session storage (only relevant for projectPath)
                     pathInput.dispatchEvent(new Event('input'));
                 }
                 showNotification('Folder selected successfully!', 'success');
             } else if (data.error) {
-                console.error("Browse error:", data.error);
                 showNotification("Error: " + data.error, 'error');
             }
-            // else: user cancelled, do nothing
         } else {
             const errorData = await response.json();
-            console.error("Browse endpoint returned error:", errorData);
-            showNotification("Error: " + (errorData.error || "Unknown error occurred"), 'error');
+            showNotification("Error: " + (errorData.error || "Unknown error"), 'error');
         }
     } catch (err) {
         clearTimeout(hintTimeout);
-        if (hintElement) {
-            hintElement.style.display = 'none';
-            hintElement.classList.remove('pulse-animation');
-        }
-        // Restore button
+        if (hintElement) hintElement.style.display = 'none';
         if (browseBtn) {
             browseBtn.disabled = false;
             browseBtn.innerHTML = '<i class="fas fa-folder-open"></i>';
         }
         console.error("Browse Error:", err);
-        showNotification("Could not open folder picker. Please enter the path manually.", 'error');
+        showNotification("Could not open folder picker.", 'error');
+    }
+}
+
+/* --- Web Folder Modal Logic --- */
+
+function openFolderModal() {
+    const modal = document.getElementById('folderModal');
+    if(modal) {
+        modal.classList.add('active');
+        // Start at root or current value if valid
+        const currentVal = document.getElementById(currentTargetInputId)?.value;
+        currentBrowsePath = (currentVal && currentVal.startsWith('/')) ? currentVal : '/';
+        loadModalPath(currentBrowsePath);
+    }
+}
+
+function closeFolderModal() {
+    const modal = document.getElementById('folderModal');
+    if(modal) modal.classList.remove('active');
+}
+
+async function loadModalPath(path) {
+    const listContainer = document.getElementById('modalFolderList');
+    const breadcrumb = document.getElementById('modalBreadcrumb');
+    const selectBtn = document.getElementById('modalSelectBtn');
+    
+    if(!listContainer) return;
+    
+    listContainer.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    selectBtn.textContent = `Select: ${path}`;
+    selectBtn.disabled = false;
+    currentBrowsePath = path;
+
+    // Update Breadcrumb
+    const parts = path.split('/').filter(p => p);
+    let breadHtml = `<span class="breadcrumb-item" onclick="loadModalPath('/')"><i class="fas fa-hdd"></i> root</span>`;
+    
+    let currentBuild = '';
+    parts.forEach((part, index) => {
+        currentBuild += '/' + part;
+        // Capture value for closure
+        const clickPath = currentBuild; 
+        breadHtml += ` <span class="breadcrumb-separator">/</span> <span class="breadcrumb-item" onclick="loadModalPath('${clickPath}')">${part}</span>`;
+    });
+    breadcrumb.innerHTML = breadHtml;
+
+    try {
+        const res = await fetch(`/api/utils/list-dirs?path=${encodeURIComponent(path)}`);
+        if(res.ok) {
+            const files = await res.json();
+            renderFolderList(files);
+        } else {
+            listContainer.innerHTML = '<div style="color:red; padding:10px;">Failed to load directory.</div>';
+        }
+    } catch(e) {
+        console.error(e);
+        listContainer.innerHTML = '<div style="color:red; padding:10px;">Error loading directory.</div>';
+    }
+}
+
+function renderFolderList(files) {
+    const container = document.getElementById('modalFolderList');
+    container.innerHTML = '';
+    
+    // Parent link if not root
+    if(currentBrowsePath !== '/' && currentBrowsePath !== '') {
+         const parentPath = currentBrowsePath.substring(0, currentBrowsePath.lastIndexOf('/')) || '/';
+         const div = document.createElement('div');
+         div.className = 'folder-item';
+         div.innerHTML = `<i class="fas fa-level-up-alt folder-icon"></i> <span>.. (Up one level)</span>`;
+         div.onclick = () => loadModalPath(parentPath);
+         container.appendChild(div);
+    }
+
+    if(files.length === 0) {
+        const div = document.createElement('div');
+        div.style.padding = "10px";
+        div.style.color = "#718096";
+        div.innerHTML = "No subdirectories found.";
+        container.appendChild(div);
+        return;
+    }
+
+    files.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'folder-item';
+        div.innerHTML = `<i class="fas fa-folder folder-icon"></i> <span>${file.name}</span>`;
+        div.onclick = () => loadModalPath(file.path);
+        container.appendChild(div);
+    });
+}
+
+function confirmFolderSelection() {
+    if(currentTargetInputId && currentBrowsePath) {
+        const input = document.getElementById(currentTargetInputId);
+        input.value = currentBrowsePath;
+        input.dispatchEvent(new Event('input'));
+        closeFolderModal();
     }
 }
 

@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributeView;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,26 @@ public class ConcatenationService {
     private static final String XML_FILE_START = "<file path=\"%s\">\n";
     private static final String XML_FILE_END = "</file>\n";
     private static final long MB_TO_BYTES = 1024 * 1024;
+
+    // Config files to ALWAYS include (useful for AI context)
+    private static final Set<String> ALWAYS_INCLUDE_FILES = Set.of(
+            "Dockerfile", "Jenkinsfile", "Makefile", "Procfile",
+            "docker-compose.yml", "docker-compose.yaml",
+            "pom.xml", "build.gradle", "settings.gradle",
+            ".gitignore", ".dockerignore");
+
+    // Config/script extensions to ALWAYS include
+    private static final Set<String> ALWAYS_INCLUDE_EXTENSIONS = Set.of(
+            ".yml", ".yaml", ".xml", ".json", ".properties", ".conf",
+            ".sh", ".bat", ".cmd", ".ps1",
+            ".toml", ".ini", ".cfg", ".env");
+
+    // Directories to ALWAYS exclude (build artifacts, dependencies)
+    private static final Set<String> DEFAULT_EXCLUDE_PATTERNS = Set.of(
+            "target/**", "build/**", "dist/**", "out/**",
+            "node_modules/**", ".git/**", "bin/**", "obj/**",
+            "__pycache__/**", ".idea/**", ".vscode/**",
+            "*.exe", "*.dll", "*.so", "*.dylib", "*.class", "*.jar", "*.war");
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
@@ -98,11 +119,10 @@ public class ConcatenationService {
             // FIX: Add output folder to exclude patterns PRE-SCAN
             excludePatterns.add(outputFolder);
             excludePatterns.add(outputFolder + "/**");
-            // Also exclude generic "target" and "build" folders if not already there, just
-            // in case
-            excludePatterns.add("target/**");
-            excludePatterns.add("build/**");
-            excludePatterns.add(".git/**");
+            // Add default exclusions for build artifacts and dependencies
+            excludePatterns.addAll(DEFAULT_EXCLUDE_PATTERNS);
+            // Exclude the metadata file itself
+            excludePatterns.add(METADATA_FILE_NAME);
 
             // Step 4: Scan project files
             log.info("Scanning project files...");
@@ -266,11 +286,20 @@ public class ConcatenationService {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 String relativePath = projectPath.relativize(file).toString();
-                String extension = "." + FilenameUtils.getExtension(file.getFileName().toString());
+                String fileName = file.getFileName().toString();
+                String extension = "." + FilenameUtils.getExtension(fileName);
 
-                // Check if file should be included
-                if (!shouldExclude(relativePath, excludePatterns) &&
-                        includeExtensions.contains(extension)) {
+                // Skip if excluded
+                if (shouldExclude(relativePath, excludePatterns)) {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                // Include if: matches user extensions OR is a config file/script
+                boolean matchesUserExtension = includeExtensions.contains(extension);
+                boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
+                boolean isAlwaysIncludeExtension = ALWAYS_INCLUDE_EXTENSIONS.contains(extension);
+
+                if (matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) {
                     files.add(file);
                 }
 
@@ -564,12 +593,24 @@ public class ConcatenationService {
 
     /**
      * Save metadata for future incremental updates.
+     * On Windows, the file is marked as hidden.
      */
     private String saveMetadata(Path projectPath, ProjectMetadata metadata) throws IOException {
         Path metadataPath = projectPath.resolve(METADATA_FILE_NAME);
 
         objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(metadataPath.toFile(), metadata);
+
+        // Make the file hidden on Windows
+        try {
+            DosFileAttributeView dosView = Files.getFileAttributeView(metadataPath, DosFileAttributeView.class);
+            if (dosView != null) {
+                dosView.setHidden(true);
+                log.debug("Set hidden attribute on metadata file: {}", metadataPath);
+            }
+        } catch (Exception e) {
+            log.warn("Could not set hidden attribute on metadata file (non-Windows OS?): {}", e.getMessage());
+        }
 
         log.info("Saved metadata: {}", metadataPath);
 

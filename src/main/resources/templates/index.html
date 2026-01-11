@@ -113,6 +113,25 @@
         </div>
     </div>
 
+    <!-- Folder Selection Modal -->
+    <div id="folderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Folder</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="breadcrumb" id="modalBreadcrumb"></div>
+                <div class="folder-list" id="modalFolderList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancelBtn" style="width: auto;">Cancel</button>
+                <button class="btn btn-primary" id="modalSelectBtn" style="width: auto;" disabled>Select This
+                    Folder</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/main.js"></script>
 </body>
 

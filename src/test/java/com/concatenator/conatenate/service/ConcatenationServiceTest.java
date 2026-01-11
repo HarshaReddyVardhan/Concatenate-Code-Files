@@ -275,4 +275,64 @@ class ConcatenationServiceTest {
 
         assertTrue(outputCount >= 2, "Should have split into at least 2 files given the size limit");
     }
+
+    @Test
+    void testConfigFilesIncludedAndMetadataExcluded() throws IOException {
+        // Setup project with config files
+        Path root = tempDir;
+
+        // Create source code
+        Path src = root.resolve("src");
+        Files.createDirectories(src);
+        Files.writeString(src.resolve("App.java"), "public class App {}");
+
+        // Create config files that should ALWAYS be included
+        Files.writeString(root.resolve("Dockerfile"), "FROM openjdk:17");
+        Files.writeString(root.resolve("docker-compose.yml"), "version: '3'");
+        Path k8s = root.resolve("k8s");
+        Files.createDirectories(k8s);
+        Files.writeString(k8s.resolve("deployment.yaml"), "apiVersion: apps/v1");
+        Files.writeString(root.resolve("build.sh"), "#!/bin/bash\nmvn clean install");
+        Files.writeString(root.resolve("deploy.bat"), "@echo off\necho Deploying...");
+
+        // Create build artifact folder that should be excluded
+        Path target = root.resolve("target");
+        Files.createDirectories(target);
+        Files.writeString(target.resolve("app.jar"), "BINARY_CONTENT");
+
+        // Create fake metadata file that should be excluded
+        Files.writeString(root.resolve(".project-concat-metadata.json"), "{\"old\":\"metadata\"}");
+
+        ConcatenationRequest request = ConcatenationRequest.builder()
+                .projectPath(tempDir.toString())
+                .outputFolder("output")
+                .includeExtensions(new HashSet<>(Collections.singletonList(".java")))
+                .build();
+
+        ConcatenationResult result = concatenationService.generateConcatenation(request);
+
+        assertTrue(result.getSuccess());
+
+        // Gather all output content
+        Path outputDir = tempDir.resolve("output");
+        StringBuilder allContent = new StringBuilder();
+        for (String file : result.getOutputFiles()) {
+            allContent.append(Files.readString(Path.of(file)));
+        }
+        String content = allContent.toString();
+
+        // Verify config files ARE included
+        assertTrue(content.contains("FROM openjdk:17"), "Dockerfile should be included");
+        assertTrue(content.contains("version: '3'"), "docker-compose.yml should be included");
+        assertTrue(content.contains("apiVersion: apps/v1"), "Kubernetes YAML should be included");
+        assertTrue(content.contains("#!/bin/bash"), "Shell script should be included");
+        assertTrue(content.contains("@echo off"), "Batch script should be included");
+        assertTrue(content.contains("public class App"), "Java source should be included");
+
+        // Verify build artifacts are EXCLUDED
+        assertFalse(content.contains("BINARY_CONTENT"), "Build artifacts (target/) should be excluded");
+
+        // Verify old metadata is EXCLUDED from the output content
+        assertFalse(content.contains("\"old\":\"metadata\""), "Metadata file should be excluded from output");
+    }
 }

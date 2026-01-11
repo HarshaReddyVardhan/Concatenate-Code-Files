@@ -7,9 +7,10 @@ services:
     container_name: concatenator
     ports:
       - "8080:8080"
-    # Mount the current directory (project root) to /data inside container
-    # You can change './' to any specific path you want to expose to the app
     volumes:
-      - ./:/data
+      - .:/workspace        # ← Current project folder
+      - /c/:/host/c         # ← Your C: drive
+      - /d/:/host/d         # ← Your D: drive
     environment:
       - APP_IN_DOCKER=true
+      - JAVA_AWT_HEADLESS=true

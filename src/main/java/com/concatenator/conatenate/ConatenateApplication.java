@@ -73,18 +73,27 @@ public class ConatenateApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void openBrowser() {
 		String url = "http://localhost:8080";
+		String isDocker = System.getenv("APP_IN_DOCKER");
+
 		log.info("=================================================");
-		log.info("Application ready at: {}", url);
+		log.info("Application ready at: " + url);
 		log.info("=================================================");
+
+		// Skip auto-open in Docker (no GUI available)
+		if ("true".equalsIgnoreCase(isDocker)) {
+			log.info("Running in Docker - Open manually: " + url);
+			return; // ← Only skip the Desktop stuff
+		}
+
+		// On local machine, try to open browser
 		try {
 			if (Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(new URI(url));
 				log.info("Browser opened successfully");
-			} else {
-				log.warn("Desktop not supported, please open browser manually");
 			}
 		} catch (Exception e) {
-			log.error("Could not open browser: {}", e.getMessage());
+			log.error("Could not open browser: " + e.getMessage());
 		}
 	}
+
 }
