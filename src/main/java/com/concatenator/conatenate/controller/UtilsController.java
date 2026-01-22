@@ -17,11 +17,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.concatenator.conatenate.service.ConcatenationService;
+
 @RestController
 @RequestMapping("/api/utils")
 public class UtilsController {
 
     private static final Logger log = LoggerFactory.getLogger(UtilsController.class);
+    private final ConcatenationService concatenationService;
+
+    public UtilsController(ConcatenationService concatenationService) {
+        this.concatenationService = concatenationService;
+    }
 
     @jakarta.annotation.PostConstruct
     public void init() {
@@ -180,5 +187,16 @@ public class UtilsController {
         result.sort(Comparator.comparing(m -> ((String) m.get("name")).toLowerCase()));
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/file-tree")
+    public ResponseEntity<List<Map<String, Object>>> getFileTree(@RequestParam String path) {
+        try {
+            List<Map<String, Object>> tree = concatenationService.getProjectFileTree(path);
+            return ResponseEntity.ok(tree);
+        } catch (Exception e) {
+            log.error("Error generating file tree for path: {}", path, e);
+            return ResponseEntity.internalServerError().body(Collections.emptyList());
+        }
     }
 }

@@ -41,4 +41,7 @@ public class ConcatenationResult {
     private Long estimatedTokenCount;
 
     private String previewFileTree;
+
+    @Builder.Default
+    private List<String> processedFilePaths = new ArrayList<>();
 }

@@ -33,9 +33,16 @@
                             onclick="browseFolder('projectPath')" title="Browse Folder">
                             <i class="fas fa-folder-open"></i>
                         </button>
+                        <button type="button" class="btn btn-secondary" id="selectFilesBtn" style="width:auto;"
+                            onclick="openFileSelectionModal()" title="Select Specific Files" disabled>
+                            <i class="fas fa-list-check"></i> Files
+                        </button>
                     </div>
                     <p id="browseHint" class="help-text" style="display:none; color:#d69e2e;">
                         <i class="fas fa-info-circle"></i> Check your taskbar for the folder selection window.
+                    </p>
+                    <p id="fileSelectionHint" class="help-text" style="display:none; color:#2f855a;">
+                        <i class="fas fa-check-circle"></i> <span id="fileSelectionCount">All files</span> selected.
                     </p>
                 </div>
 
@@ -128,6 +135,49 @@
                 <button class="btn btn-secondary" id="modalCancelBtn" style="width: auto;">Cancel</button>
                 <button class="btn btn-primary" id="modalSelectBtn" style="width: auto;" disabled>Select This
                     Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Selection Modal -->
+    <div id="fileSelectionModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; height: 80vh;">
+            <div class="modal-header">
+                <h3>Select Files to Concatenate</h3>
+                <span class="close-file-modal" onclick="closeFileSelectionModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="background: #fafbfc;">
+                <div
+                    style="padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                    <div>
+                        <button type="button" class="btn btn-secondary"
+                            style="width: auto; padding: 5px 10px; font-size: 12px;"
+                            onclick="toggleAllFiles(true)">Select All</button>
+                        <button type="button" class="btn btn-secondary"
+                            style="width: auto; padding: 5px 10px; font-size: 12px;"
+                            onclick="toggleAllFiles(false)">Deselect All</button>
+                    </div>
+                    <div style="font-size: 13px; color: #666; display: flex; align-items: center; gap: 5px;">
+                        <i class="fas fa-filter"></i> Only showing non-ignored files
+                    </div>
+                </div>
+                <div id="fileTreeContainer" class="tree-container">
+                    <!-- Tree injected here -->
+                    <div style="text-align:center; padding:20px; color:#a0aec0;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading file structure...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <div class="selection-summary" id="selectionSummary">
+                    0 files selected
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="closeFileSelectionModal()"
+                        style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="confirmFileSelection()" style="width: auto;">Confirm
+                        Selection</button>
+                </div>
             </div>
         </div>
     </div>

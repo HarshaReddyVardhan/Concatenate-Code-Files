@@ -27,6 +27,9 @@ public class ConcatenationRequest {
 
     private Boolean incrementalUpdate;
 
+    // Optional: exact list of files to include (for Tree View selection)
+    private java.util.List<String> selectedFilePaths;
+
     // AI Agent Features
     @Builder.Default
     private Boolean useXmlTags = false;

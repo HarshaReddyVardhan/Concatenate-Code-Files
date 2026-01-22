@@ -382,7 +382,7 @@ input[type="number"]:focus {
     border-radius: 12px;
     width: 90%;
     max-width: 600px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     max-height: 80vh;
@@ -484,4 +484,121 @@ input[type="number"]:focus {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+/* --- Tree View Component Styles --- */
+.tree-container {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 500px;
+    /* Limit height */
+    overflow-y: auto;
+    background: #fff;
+    margin-top: 10px;
+}
+
+.tree-ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tree-li {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    /* Indentation for children */
+    padding-left: 20px;
+}
+
+/* Root level should not have extra padding */
+.tree-ul>.tree-li {
+    padding-left: 0;
+}
+
+.tree-item-content {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.1s;
+    cursor: default;
+}
+
+.tree-item-content:hover {
+    background-color: #edf2f7;
+}
+
+.tree-checkbox {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    /* Custom accent color if supported */
+    accent-color: #667eea;
+}
+
+.tree-label {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #2d3748;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-caret {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: #a0aec0;
+    font-size: 12px;
+    margin-right: 4px;
+    transition: transform 0.2s;
+}
+
+.tree-caret:hover {
+    color: #4a5568;
+}
+
+.tree-caret-down {
+    transform: rotate(90deg);
+}
+
+.tree-icon {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.tree-icon.folder {
+    color: #f6ad55;
+}
+
+.tree-icon.file {
+    color: #a0aec0;
+}
+
+.tree-children {
+    display: none;
+}
+
+.tree-children.active {
+    display: block;
+}
+
+.selection-summary {
+    padding: 10px;
+    background: #f0fff4;
+    border: 1px solid #9ae6b4;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #22543d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

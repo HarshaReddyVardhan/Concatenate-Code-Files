@@ -146,6 +146,23 @@ public class ConcatenationService {
                         .collect(Collectors.toList());
             }
 
+            // Filter by selected paths if provided (and not empty)
+            if (request.getSelectedFilePaths() != null && !request.getSelectedFilePaths().isEmpty()) {
+                Set<String> selectedSet = new HashSet<>(request.getSelectedFilePaths());
+                // Normalize selected paths to ensure matching works
+                // The frontend should send paths relative to project root
+                log.info("Filtering with {} selected files", selectedSet.size());
+
+                allFiles = allFiles.stream()
+                        .filter(file -> {
+                            String relPath = projectPath.relativize(file).toString().replace("\\", "/");
+                            // Also check standard separator just in case
+                            String relPathStd = projectPath.relativize(file).toString();
+                            return selectedSet.contains(relPath) || selectedSet.contains(relPathStd);
+                        })
+                        .collect(Collectors.toList());
+            }
+
             log.info("Found {} files to process", allFiles.size());
 
             // Step 5: Calculate hashes and detect changes
@@ -255,6 +272,9 @@ public class ConcatenationService {
                     .metadataFile(metadataFile)
                     .estimatedTokenCount(Boolean.TRUE.equals(request.getEstimateTokens()) ? totalTokens : null)
                     .previewFileTree(asciiTree)
+                    .processedFilePaths(filesToProcess.stream()
+                            .map(path -> projectPath.relativize(path).toString())
+                            .collect(Collectors.toList()))
                     .build();
 
         } catch (Exception e) {
@@ -661,5 +681,64 @@ public class ConcatenationService {
                 .message(message)
                 .errors(Collections.singletonList(message))
                 .build();
+    }
+
+    /**
+     * Get the file tree structure for the project.
+     * Used by the frontend for file selection.
+     */
+    public List<Map<String, Object>> getProjectFileTree(String projectPathStr) throws IOException {
+        Path projectPath = Paths.get(projectPathStr);
+        if (!Files.exists(projectPath) || !Files.isDirectory(projectPath)) {
+            return Collections.emptyList();
+        }
+
+        return buildFileTreeNodes(projectPath, projectPath);
+    }
+
+    private List<Map<String, Object>> buildFileTreeNodes(Path root, Path currentDir) throws IOException {
+        List<Map<String, Object>> nodes = new ArrayList<>();
+
+        // Use try-with-resources to ensure the stream is closed
+        try (var stream = Files.list(currentDir)) {
+            List<Path> files = stream.collect(Collectors.toList());
+
+            // Sort: Directories first, then files, both alphabetically
+            files.sort((p1, p2) -> {
+                boolean d1 = Files.isDirectory(p1);
+                boolean d2 = Files.isDirectory(p2);
+                if (d1 != d2) {
+                    return d1 ? -1 : 1;
+                }
+                return p1.getFileName().toString().compareToIgnoreCase(p2.getFileName().toString());
+            });
+
+            for (Path path : files) {
+                String fileName = path.getFileName().toString();
+
+                // Skip .git folder
+                if (Files.isDirectory(path) && ".git".equals(fileName)) {
+                    continue;
+                }
+
+                Map<String, Object> node = new HashMap<>();
+                node.put("name", fileName);
+                node.put("path", root.relativize(path).toString().replace("\\", "/"));
+
+                if (Files.isDirectory(path)) {
+                    node.put("type", "directory");
+                    node.put("children", buildFileTreeNodes(root, path));
+                } else {
+                    node.put("type", "file");
+                }
+
+                nodes.add(node);
+            }
+        } catch (AccessDeniedException e) {
+            log.warn("Access denied reading directory: {}", currentDir);
+            // Return empty list or partially filled list for this directory
+        }
+
+        return nodes;
     }
 }
