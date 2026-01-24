@@ -76,6 +76,33 @@ public class ConcatenationService {
     }
 
     /**
+     * Checks if a file is a text file by scanning for NUL bytes.
+     * @param path The path to the file
+     * @return true if it appears to be a text file
+     */
+    private boolean isTextFile(Path path) {
+        try {
+            // Only check files that have content
+            if (Files.size(path) == 0) return true;
+
+            byte[] buffer = new byte[1024];
+            try (java.io.InputStream is = Files.newInputStream(path)) {
+                int bytesRead = is.read(buffer);
+                for (int i = 0; i < bytesRead; i++) {
+                    if (buffer[i] == 0) { // NUL byte found: likely binary
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (IOException e) {
+            log.warn("Could not determine if file is text: {}", path);
+            return false;
+        }
+    }
+
+
+    /**
      * MAIN METHOD: Generate concatenated files for a project.
      *
      * Process Flow:
@@ -347,8 +374,11 @@ public class ConcatenationService {
                 boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
                 boolean isAlwaysIncludeExtension = ALWAYS_INCLUDE_EXTENSIONS.contains(extension);
 
-                if (matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) {
+                if ((matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) &&
+                 isTextFile(file)) {
                     files.add(file);
+                } else if (isAlwaysIncludeFile || isAlwaysIncludeExtension) {
+                    log.warn("Skipping file: {}", relativePath);
                 }
 
                 return FileVisitResult.CONTINUE;
