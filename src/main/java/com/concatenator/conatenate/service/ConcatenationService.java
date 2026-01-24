@@ -35,20 +35,37 @@ public class ConcatenationService {
             "Dockerfile", "Jenkinsfile", "Makefile", "Procfile",
             "docker-compose.yml", "docker-compose.yaml",
             "pom.xml", "build.gradle", "settings.gradle",
+            "Cargo.toml", "Cargo.lock",               // Rust
+            "go.mod", "go.sum",                       // Go
+            "package.json", "yarn.lock", "pnpm-lock.yaml", // Node/JS
+            "composer.json", "composer.lock",         // PHP
+            "requirements.txt", "pyproject.toml",     // Python
+            "mix.exs",                                // Elixir
             ".gitignore", ".dockerignore");
+
 
     // Config/script extensions to ALWAYS include
     private static final Set<String> ALWAYS_INCLUDE_EXTENSIONS = Set.of(
             ".yml", ".yaml", ".xml", ".json", ".properties", ".conf",
             ".sh", ".bat", ".cmd", ".ps1",
-            ".toml", ".ini", ".cfg", ".env");
+            ".toml", ".ini", ".cfg", ".env",
+            ".hcl", ".tf",          // Terraform / HashiCorp
+            ".proto",               // Protocol Buffers
+            ".graphql", ".gql",     // GraphQL
+            ".sql");                // Database migrations
+
 
     // Directories to ALWAYS exclude (build artifacts, dependencies)
     private static final Set<String> DEFAULT_EXCLUDE_PATTERNS = Set.of(
             "target/**", "build/**", "dist/**", "out/**",
             "node_modules/**", ".git/**", "bin/**", "obj/**",
-            "__pycache__/**", ".idea/**", ".vscode/**",
-            "*.exe", "*.dll", "*.so", "*.dylib", "*.class", "*.jar", "*.war");
+            "vendor/**",            // Go dependencies / PHP
+            "testdata/**",          // Go test data
+            "__pycache__/**", ".pytest_cache/**", "venv/**", ".venv/**",
+            ".idea/**", ".vscode/**", ".zed/**", // Editors
+            "*.exe", "*.dll", "*.so", "*.dylib", "*.class", "*.jar", "*.war",
+            "*.pdb", "*.out", "*.test"); // Build outputs and debug symbols
+
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
