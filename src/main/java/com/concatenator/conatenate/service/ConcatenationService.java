@@ -43,7 +43,27 @@ public class ConcatenationService {
             "composer.json", "composer.lock", // PHP
             "requirements.txt", "pyproject.toml", // Python
             "mix.exs", // Elixir
-            ".gitignore", ".dockerignore");
+            ".gitignore", ".dockerignore",
+            // Web / Frontend / Configs
+            "index.html",
+            "vite.config.js", "vite.config.ts",
+            "vue.config.js", "vue.config.ts",
+            "nuxt.config.js", "nuxt.config.ts",
+            "next.config.js", "next.config.ts", "next.config.mjs",
+            "svelte.config.js",
+            "rollup.config.js", "rollup.config.ts",
+            "webpack.config.js", "webpack.config.ts", "webpack.config.cjs",
+            "jest.config.js", "jest.config.ts",
+            "vitest.config.ts", "vitest.config.js",
+            "playwright.config.ts", "playwright.config.js",
+            "cypress.config.ts", "cypress.config.js", "cypress.json",
+            "tailwind.config.js", "tailwind.config.ts", "tailwind.config.cjs",
+            "postcss.config.js", "postcss.config.cjs",
+            "eslint.config.js", "eslint.config.mjs",
+            "prettier.config.js", ".prettierrc.js", ".eslintrc.js",
+            // JSON Configs
+            "tsconfig.json", "jsconfig.json",
+            "angular.json", "nx.json", "turbo.json", "lerna.json");
 
     // Config/script extensions to ALWAYS include
     private static final Set<String> ALWAYS_INCLUDE_EXTENSIONS = Set.of(
@@ -420,8 +440,10 @@ public class ConcatenationService {
                 String fileName = file.getFileName().toString();
                 String extension = "." + FilenameUtils.getExtension(fileName);
 
-                // Skip if excluded
-                if (shouldExclude(relativePath, excludePatterns)) {
+                boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
+
+                // Skip if excluded (unless it's an always-include file)
+                if (!isAlwaysIncludeFile && shouldExclude(relativePath, excludePatterns)) {
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -439,7 +461,7 @@ public class ConcatenationService {
 
                 // Include if: matches user extensions OR is a config file/script
                 boolean matchesUserExtension = includeExtensions.contains(extension);
-                boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
+                // isAlwaysIncludeFile already calculated above
                 boolean isAlwaysIncludeExtension = ALWAYS_INCLUDE_EXTENSIONS.contains(extension);
 
                 if ((matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) &&
