@@ -345,13 +345,19 @@ function setLoading(isLoading) {
     const loader = document.getElementById('loading');
     const result = document.getElementById('result');
     const placeholder = document.getElementById('placeholder');
+    const generateBtn = document.getElementById('generateBtn');
+    const updateBtn = document.getElementById('updateBtn');
 
     if (isLoading) {
         loader.style.display = 'block';
         if (result) result.style.display = 'none';
         if (placeholder) placeholder.style.display = 'none';
+        if (generateBtn) generateBtn.disabled = true;
+        if (updateBtn) updateBtn.disabled = true;
     } else {
         loader.style.display = 'none';
+        if (generateBtn) generateBtn.disabled = false;
+        if (updateBtn) updateBtn.disabled = false;
     }
 }
 

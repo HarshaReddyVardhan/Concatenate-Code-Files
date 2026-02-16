@@ -15,6 +15,7 @@ import java.nio.file.attribute.DosFileAttributeView;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +38,8 @@ public class ConcatenationService {
     private Set<String> alwaysIncludeFiles;
     private Set<String> alwaysIncludeExtensions;
     private Set<String> defaultExcludePatterns;
+
+    private final Map<String, Object> projectLocks = new ConcurrentHashMap<>();
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
@@ -148,238 +151,253 @@ public class ConcatenationService {
 
         log.info("Starting concatenation for project: {}", request.getProjectPath());
 
-        try {
-            // Step 1: Validate and prepare
-            Path projectPath = Paths.get(request.getProjectPath());
-            if (!Files.exists(projectPath) || !Files.isDirectory(projectPath)) {
-                return createErrorResult("Project path does not exist or is not a directory");
-            }
-
-            // Step 2: Merge user settings with request
-            UserSettings userSettings = userSettingsService.loadSettings();
-            Set<String> excludePatterns = mergeSettings(
-                    request.getExcludePatterns(),
-                    userSettings.getExcludePatterns());
-            Set<String> includeExtensions = mergeSettings(
-                    request.getIncludeExtensions(),
-                    userSettings.getIncludeExtensions());
-
-            String outputFolderRequest = request.getOutputFolder();
-            String defaultFolderName = projectPath.getFileName().toString() + "_Concatenated_Output";
-            Path outputPath;
-
-            if (outputFolderRequest == null || outputFolderRequest.trim().isEmpty()) {
-                // Default: create the output folder inside the project directory
-                outputPath = projectPath.resolve(defaultFolderName);
-            } else {
-                Path providedPath = Paths.get(outputFolderRequest);
-                if (providedPath.isAbsolute()) {
-                    // Absolute path: create the subfolder inside the specified directory
-                    outputPath = providedPath.resolve(defaultFolderName);
-                } else {
-                    // Relative path: resolve relative to project, then create subfolder inside
-                    outputPath = projectPath.resolve(outputFolderRequest).resolve(defaultFolderName);
+        // Synchronize per project path to prevent race conditions from double-clicks
+        synchronized (projectLocks.computeIfAbsent(request.getProjectPath(), k -> new Object())) {
+            try {
+                // Step 1: Validate and prepare
+                Path projectPath = Paths.get(request.getProjectPath());
+                if (!Files.exists(projectPath) || !Files.isDirectory(projectPath)) {
+                    return createErrorResult("Project path does not exist or is not a directory");
                 }
-            }
 
-            int maxFileSizeMb = request.getMaxFileSizeMb() != null
-                    ? request.getMaxFileSizeMb()
-                    : userSettings.getDefaultMaxFileSizeMb();
+                // Step 2: Merge user settings with request
+                UserSettings userSettings = userSettingsService.loadSettings();
+                Set<String> excludePatterns = mergeSettings(
+                        request.getExcludePatterns(),
+                        userSettings.getExcludePatterns());
+                Set<String> includeExtensions = mergeSettings(
+                        request.getIncludeExtensions(),
+                        userSettings.getIncludeExtensions());
 
-            Files.createDirectories(outputPath);
+                String outputFolderRequest = request.getOutputFolder();
+                String defaultFolderName = projectPath.getFileName().toString() + "_Concatenated_Output";
+                Path outputPath;
 
-            // Step 4: Load previous metadata (for incremental updates)
-            // now
-            ProjectMetadata previousMetadata = loadMetadata(outputPath);
-            boolean isIncremental = Boolean.TRUE.equals(request.getIncrementalUpdate())
-                    && previousMetadata != null;
-
-            // FIX: Add output folder to exclude patterns PRE-SCAN
-            if (outputPath.startsWith(projectPath)) {
-                String relativeOut = projectPath.relativize(outputPath).toString();
-                excludePatterns.add(relativeOut);
-                excludePatterns.add(relativeOut + "/**");
-            }
-
-            // Also exclude the requested output folder itself if it's inside the project
-            // (e.g. if user asked for "dist" and we generate "dist/ProjectName_Output",
-            // "dist" might explicitly contain other junk)
-            if (outputFolderRequest != null && !outputFolderRequest.isBlank()) {
-                Path requestedPath = Paths.get(outputFolderRequest);
-                Path absRequestedPath = requestedPath.isAbsolute() ? requestedPath
-                        : projectPath.resolve(requestedPath);
-
-                if (absRequestedPath.startsWith(projectPath)) {
-                    String rel = projectPath.relativize(absRequestedPath).toString();
-                    if (!rel.isEmpty()) {
-                        excludePatterns.add(rel);
-                        excludePatterns.add(rel + "/**");
+                if (outputFolderRequest == null || outputFolderRequest.trim().isEmpty()) {
+                    // Default: create the output folder inside the project directory
+                    outputPath = projectPath.resolve(defaultFolderName);
+                } else {
+                    Path providedPath = Paths.get(outputFolderRequest);
+                    if (providedPath.isAbsolute()) {
+                        // Absolute path: create the subfolder inside the specified directory
+                        outputPath = providedPath.resolve(defaultFolderName);
+                    } else {
+                        // Relative path: resolve relative to project, then create subfolder inside
+                        outputPath = projectPath.resolve(outputFolderRequest).resolve(defaultFolderName);
                     }
                 }
-            }
-            // Add default exclusions for build artifacts and dependencies
-            excludePatterns.addAll(defaultExcludePatterns);
-            // Exclude the metadata file itself
-            excludePatterns.add(METADATA_FILE_NAME);
 
-            // Step 4: Scan project files
-            long maxSizeBytes = maxFileSizeMb * MB_TO_BYTES;
-            log.info("Scanning project files... (Max file size: {} MB)", maxFileSizeMb);
-            List<Path> allFiles = scanProjectFiles(projectPath, excludePatterns, includeExtensions, maxSizeBytes);
+                int maxFileSizeMb = request.getMaxFileSizeMb() != null
+                        ? request.getMaxFileSizeMb()
+                        : userSettings.getDefaultMaxFileSizeMb();
 
-            // AUTO-FIX: Double check exclusion
-            if (outputPath.startsWith(projectPath)) {
-                allFiles = allFiles.stream()
-                        .filter(file -> !file.startsWith(outputPath))
-                        .collect(Collectors.toList());
-            }
+                Files.createDirectories(outputPath);
 
-            // Filter by selected paths if provided (and not empty)
-            if (request.getSelectedFilePaths() != null && !request.getSelectedFilePaths().isEmpty()) {
-                Set<String> selectedSet = new HashSet<>(request.getSelectedFilePaths());
-                // Normalize selected paths to ensure matching works
-                // The frontend should send paths relative to project root
-                log.info("Filtering with {} selected files", selectedSet.size());
+                // Step 4: Load previous metadata (for incremental updates)
+                // now
+                ProjectMetadata previousMetadata = loadMetadata(outputPath);
+                boolean isIncremental = Boolean.TRUE.equals(request.getIncrementalUpdate())
+                        && previousMetadata != null;
 
-                allFiles = allFiles.stream()
-                        .filter(file -> {
-                            String relPath = projectPath.relativize(file).toString().replace("\\", "/");
-                            // Also check standard separator just in case
-                            String relPathStd = projectPath.relativize(file).toString();
-                            return selectedSet.contains(relPath) || selectedSet.contains(relPathStd);
-                        })
-                        .collect(Collectors.toList());
-            }
+                // FIX: Add output folder to exclude patterns PRE-SCAN
+                if (outputPath.startsWith(projectPath)) {
+                    String relativeOut = projectPath.relativize(outputPath).toString();
+                    excludePatterns.add(relativeOut);
+                    excludePatterns.add(relativeOut + "/**");
+                }
 
-            log.info("Found {} files to process", allFiles.size());
+                // Also exclude the requested output folder itself if it's inside the project
+                // (e.g. if user asked for "dist" and we generate "dist/ProjectName_Output",
+                // "dist" might explicitly contain other junk)
+                if (outputFolderRequest != null && !outputFolderRequest.isBlank()) {
+                    Path requestedPath = Paths.get(outputFolderRequest);
+                    Path absRequestedPath = requestedPath.isAbsolute() ? requestedPath
+                            : projectPath.resolve(requestedPath);
 
-            // Step 5: Calculate hashes and detect changes
-            Map<String, FileMetadata> currentMetadata = new HashMap<>();
-            List<Path> filesToProcess = new ArrayList<>();
-            int filesSkipped = 0;
+                    if (absRequestedPath.startsWith(projectPath)) {
+                        String rel = projectPath.relativize(absRequestedPath).toString();
+                        if (!rel.isEmpty()) {
+                            excludePatterns.add(rel);
+                            excludePatterns.add(rel + "/**");
+                        }
+                    }
+                }
+                // Add default exclusions for build artifacts and dependencies
+                excludePatterns.addAll(defaultExcludePatterns);
+                // Exclude the metadata file itself
+                excludePatterns.add(METADATA_FILE_NAME);
 
-            for (Path file : allFiles) {
-                String relativePath = projectPath.relativize(file).toString();
-                String hash = fileHashService.calculateFileHash(file);
+                // Step 4: Scan project files
+                long maxSizeBytes = maxFileSizeMb * MB_TO_BYTES;
+                log.info("Scanning project files... (Max file size: {} MB)", maxFileSizeMb);
+                List<Path> allFiles = scanProjectFiles(projectPath, excludePatterns, includeExtensions, maxSizeBytes);
 
-                FileMetadata metadata = FileMetadata.builder()
-                        .filePath(relativePath)
-                        .sha256Hash(hash)
-                        .lastModified(Files.getLastModifiedTime(file).toMillis())
-                        .fileSize(Files.size(file))
+                // AUTO-FIX: Double check exclusion
+                if (outputPath.startsWith(projectPath)) {
+                    allFiles = allFiles.stream()
+                            .filter(file -> !file.startsWith(outputPath))
+                            .collect(Collectors.toList());
+                }
+
+                // Filter by selected paths if provided (and not empty)
+                if (request.getSelectedFilePaths() != null && !request.getSelectedFilePaths().isEmpty()) {
+                    Set<String> selectedSet = new HashSet<>(request.getSelectedFilePaths());
+                    // Normalize selected paths to ensure matching works
+                    // The frontend should send paths relative to project root
+                    log.info("Filtering with {} selected files", selectedSet.size());
+
+                    allFiles = allFiles.stream()
+                            .filter(file -> {
+                                String relPath = projectPath.relativize(file).toString().replace("\\", "/");
+                                // Also check standard separator just in case
+                                String relPathStd = projectPath.relativize(file).toString();
+                                return selectedSet.contains(relPath) || selectedSet.contains(relPathStd);
+                            })
+                            .collect(Collectors.toList());
+                }
+
+                log.info("Found {} files to process", allFiles.size());
+
+                // Step 5: Calculate hashes and detect changes
+                Map<String, FileMetadata> currentMetadata = new HashMap<>();
+                List<Path> filesToProcess = new ArrayList<>();
+                int filesSkipped = 0;
+
+                for (Path file : allFiles) {
+                    String relativePath = projectPath.relativize(file).toString();
+                    try {
+                        String hash = fileHashService.calculateFileHash(file);
+
+                        FileMetadata metadata = FileMetadata.builder()
+                                .filePath(relativePath)
+                                .sha256Hash(hash)
+                                .lastModified(Files.getLastModifiedTime(file).toMillis())
+                                .fileSize(Files.size(file))
+                                .build();
+
+                        currentMetadata.put(relativePath, metadata);
+
+                        // Check if file changed (for incremental updates)
+                        if (isIncremental && previousMetadata.getFiles().containsKey(relativePath)) {
+                            String previousHash = previousMetadata.getFiles().get(relativePath).getSha256Hash();
+                            if (hash.equals(previousHash)) {
+                                filesSkipped++;
+                                continue; // File unchanged, skip it
+                            }
+                        }
+
+                        filesToProcess.add(file);
+                    } catch (IOException e) {
+                        log.warn("Failed to process file (skipping): {} - {}", relativePath, e.getMessage());
+                    }
+                }
+
+                log.info("Files to process: {}, Files skipped: {}", filesToProcess.size(), filesSkipped);
+
+                // Step 6: Group files by top-level folder
+                Map<String, List<Path>> filesByFolder = groupFilesByTopLevelFolder(
+                        projectPath,
+                        filesToProcess);
+
+                // Step 7: Output directory already created in Step 3
+                // Path outputPath = projectPath.resolve(outputFolder);
+                // Files.createDirectories(outputPath);
+
+                // Step 8: Generate concatenated files for each folder
+                List<String> outputFiles = new ArrayList<>();
+                long totalSize = 0;
+                long totalTokens = 0;
+                String asciiTree = null;
+
+                if (Boolean.TRUE.equals(request.getIncludeFileTree())) {
+                    asciiTree = generateAsciiTree(projectPath, allFiles);
+                }
+
+                // Sort folders to ensure deterministic order (and put root/src first if
+                // possible)
+                List<String> sortedFolders = new ArrayList<>(filesByFolder.keySet());
+                Collections.sort(sortedFolders);
+
+                boolean treeIncluded = false;
+
+                for (String folderName : sortedFolders) {
+                    List<Path> files = filesByFolder.get(folderName);
+                    String treeForThisBatch = null;
+
+                    if (!treeIncluded && Boolean.TRUE.equals(request.getIncludeFileTree())) {
+                        treeForThisBatch = asciiTree;
+                        treeIncluded = true;
+                    }
+
+                    ConcatenationOutput output = concatenateFilesWithSplit(
+                            files,
+                            projectPath,
+                            outputPath,
+                            folderName,
+                            maxFileSizeMb,
+                            request,
+                            treeForThisBatch);
+
+                    outputFiles.addAll(output.getFilePaths());
+                    totalTokens += output.getTokenCount();
+                }
+
+                // Step 9: Generate PROJECT_STRUCTURE.json
+                String structureFile = generateProjectStructure(projectPath, allFiles, outputPath);
+
+                // Step 10: Save metadata
+                ProjectMetadata newMetadata = ProjectMetadata.builder()
+                        .projectPath(projectPath.toString())
+                        .lastScanTime(System.currentTimeMillis())
+                        .files(currentMetadata)
+                        .totalFiles(allFiles.size())
+                        .totalSize(currentMetadata.values().stream()
+                                .mapToLong(FileMetadata::getFileSize)
+                                .sum())
                         .build();
 
-                currentMetadata.put(relativePath, metadata);
+                // FIX: Save metadata to outputPath
+                String metadataFile = saveMetadata(outputPath, newMetadata);
 
-                // Check if file changed (for incremental updates)
-                if (isIncremental && previousMetadata.getFiles().containsKey(relativePath)) {
-                    String previousHash = previousMetadata.getFiles().get(relativePath).getSha256Hash();
-                    if (hash.equals(previousHash)) {
-                        filesSkipped++;
-                        continue; // File unchanged, skip it
-                    }
+                // Step 11: Calculate total output size
+                for (String file : outputFiles) {
+                    totalSize += Files.size(Paths.get(file));
                 }
 
-                filesToProcess.add(file);
-            }
+                long processingTime = System.currentTimeMillis() - startTime;
 
-            log.info("Files to process: {}, Files skipped: {}", filesToProcess.size(), filesSkipped);
+                log.info("Concatenation completed in {}ms", processingTime);
 
-            // Step 6: Group files by top-level folder
-            Map<String, List<Path>> filesByFolder = groupFilesByTopLevelFolder(
-                    projectPath,
-                    filesToProcess);
+                return ConcatenationResult.builder()
+                        .success(true)
+                        .message("Concatenation completed successfully")
+                        .outputFiles(outputFiles)
+                        .totalFilesProcessed(filesToProcess.size())
+                        .filesChanged(filesToProcess.size())
+                        .filesSkipped(filesSkipped)
+                        .totalSizeBytes(totalSize)
+                        .processingTimeMs(processingTime)
+                        .projectStructureFile(structureFile)
+                        .metadataFile(metadataFile)
+                        .estimatedTokenCount(Boolean.TRUE.equals(request.getEstimateTokens()) ? totalTokens : null)
+                        .previewFileTree(asciiTree)
+                        .processedFilePaths(filesToProcess.stream()
+                                .map(path -> projectPath.relativize(path).toString())
+                                .collect(Collectors.toList()))
+                        .build();
 
-            // Step 7: Output directory already created in Step 3
-            // Path outputPath = projectPath.resolve(outputFolder);
-            // Files.createDirectories(outputPath);
-
-            // Step 8: Generate concatenated files for each folder
-            List<String> outputFiles = new ArrayList<>();
-            long totalSize = 0;
-            long totalTokens = 0;
-            String asciiTree = null;
-
-            if (Boolean.TRUE.equals(request.getIncludeFileTree())) {
-                asciiTree = generateAsciiTree(projectPath, allFiles);
-            }
-
-            // Sort folders to ensure deterministic order (and put root/src first if
-            // possible)
-            List<String> sortedFolders = new ArrayList<>(filesByFolder.keySet());
-            Collections.sort(sortedFolders);
-
-            boolean treeIncluded = false;
-
-            for (String folderName : sortedFolders) {
-                List<Path> files = filesByFolder.get(folderName);
-                String treeForThisBatch = null;
-
-                if (!treeIncluded && Boolean.TRUE.equals(request.getIncludeFileTree())) {
-                    treeForThisBatch = asciiTree;
-                    treeIncluded = true;
+            } catch (Throwable e) {
+                log.error("Error during concatenation", e);
+                if (e instanceof Error) {
+                    // For errors like OutOfMemoryError, we might want to rethrow or return as error
+                    // But logging it is critical.
                 }
-
-                ConcatenationOutput output = concatenateFilesWithSplit(
-                        files,
-                        projectPath,
-                        outputPath,
-                        folderName,
-                        maxFileSizeMb,
-                        request,
-                        treeForThisBatch);
-
-                outputFiles.addAll(output.getFilePaths());
-                totalTokens += output.getTokenCount();
+                return createErrorResult("Error: " + e.getMessage());
+            } finally {
+                // Clean up lock if needed? No, keep it for simplicity or use weak references if
+                // memory is concern.
+                // For now, infinite map is fine for desktop app usage.
             }
-
-            // Step 9: Generate PROJECT_STRUCTURE.json
-            String structureFile = generateProjectStructure(projectPath, allFiles, outputPath);
-
-            // Step 10: Save metadata
-            ProjectMetadata newMetadata = ProjectMetadata.builder()
-                    .projectPath(projectPath.toString())
-                    .lastScanTime(System.currentTimeMillis())
-                    .files(currentMetadata)
-                    .totalFiles(allFiles.size())
-                    .totalSize(currentMetadata.values().stream()
-                            .mapToLong(FileMetadata::getFileSize)
-                            .sum())
-                    .build();
-
-            // FIX: Save metadata to outputPath
-            String metadataFile = saveMetadata(outputPath, newMetadata);
-
-            // Step 11: Calculate total output size
-            for (String file : outputFiles) {
-                totalSize += Files.size(Paths.get(file));
-            }
-
-            long processingTime = System.currentTimeMillis() - startTime;
-
-            log.info("Concatenation completed in {}ms", processingTime);
-
-            return ConcatenationResult.builder()
-                    .success(true)
-                    .message("Concatenation completed successfully")
-                    .outputFiles(outputFiles)
-                    .totalFilesProcessed(filesToProcess.size())
-                    .filesChanged(filesToProcess.size())
-                    .filesSkipped(filesSkipped)
-                    .totalSizeBytes(totalSize)
-                    .processingTimeMs(processingTime)
-                    .projectStructureFile(structureFile)
-                    .metadataFile(metadataFile)
-                    .estimatedTokenCount(Boolean.TRUE.equals(request.getEstimateTokens()) ? totalTokens : null)
-                    .previewFileTree(asciiTree)
-                    .processedFilePaths(filesToProcess.stream()
-                            .map(path -> projectPath.relativize(path).toString())
-                            .collect(Collectors.toList()))
-                    .build();
-
-        } catch (Exception e) {
-            log.error("Error during concatenation", e);
-            return createErrorResult("Error: " + e.getMessage());
         }
     }
 
@@ -400,14 +418,40 @@ public class ConcatenationService {
 
         List<Path> files = new ArrayList<>();
 
+        // Pre-compile matchers for performance
+        List<PathMatcher> excludeMatchers = new ArrayList<>();
+        for (String pattern : excludePatterns) {
+            try {
+                String globPattern = "glob:" + pattern;
+                excludeMatchers.add(FileSystems.getDefault().getPathMatcher(globPattern));
+            } catch (Exception e) {
+                log.warn("Invalid exclude pattern: {}", pattern);
+            }
+        }
+
         Files.walkFileTree(projectPath, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                log.warn("Failed to access file during scan: {} ({})", file, exc.getMessage());
+                return FileVisitResult.CONTINUE;
+            }
 
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                 // Check if directory should be excluded
-                String relativePath = projectPath.relativize(dir).toString();
+                // Use absolute path check for optimization if possible, but matchers use
+                // relative usually?
+                // Actually PathMatcher matches against Path object.
+                // We should pass the path relative to project root usually if patterns are
+                // relative.
+                // But "glob:**" matches absolute paths too? No, glob matches against the Path
+                // object provided.
+                // Standard practice: match against relative path if pattern is relative.
 
-                if (shouldExclude(relativePath, excludePatterns)) {
+                Path relativePath = projectPath.relativize(dir);
+
+                if (shouldExclude(relativePath, excludeMatchers)) {
                     log.debug("Excluding directory: {}", relativePath);
                     return FileVisitResult.SKIP_SUBTREE; // Don't traverse this directory
                 }
@@ -417,14 +461,15 @@ public class ConcatenationService {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                String relativePath = projectPath.relativize(file).toString();
+                Path relativePath = projectPath.relativize(file);
+                String relativePathString = relativePath.toString();
                 String fileName = file.getFileName().toString();
                 String extension = "." + FilenameUtils.getExtension(fileName);
 
                 boolean isAlwaysIncludeFile = alwaysIncludeFiles.contains(fileName);
 
                 // Skip if excluded (unless it's an always-include file)
-                if (!isAlwaysIncludeFile && shouldExclude(relativePath, excludePatterns)) {
+                if (!isAlwaysIncludeFile && shouldExclude(relativePath, excludeMatchers)) {
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -433,11 +478,11 @@ public class ConcatenationService {
                     long fileSize = Files.size(file);
                     if (maxFileSizeBytes > 0 && fileSize > maxFileSizeBytes) {
                         log.debug("Skipping file {} ({} bytes) - exceeds max size of {} bytes",
-                                relativePath, fileSize, maxFileSizeBytes);
+                                relativePathString, fileSize, maxFileSizeBytes);
                         return FileVisitResult.CONTINUE;
                     }
                 } catch (IOException e) {
-                    log.warn("Could not determine size of file: {}", relativePath);
+                    log.warn("Could not determine size of file: {}", relativePathString);
                 }
 
                 // Include if: matches user extensions OR is a config file/script
@@ -449,7 +494,7 @@ public class ConcatenationService {
                         isTextFile(file)) {
                     files.add(file);
                 } else if (isAlwaysIncludeFile || isAlwaysIncludeExtension) {
-                    log.warn("Skipping file: {}", relativePath);
+                    log.warn("Skipping file: {}", relativePathString);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -460,35 +505,15 @@ public class ConcatenationService {
     }
 
     /**
-     * Check if a path should be excluded based on patterns.
-     * Supports wildcards: *, **, ?
-     *
-     * Examples:
-     * - "*.class" matches any .class file
-     * - "node_modules/**" matches anything under node_modules
-     * - "temp?.txt" matches temp1.txt, tempA.txt, etc.
-     *
-     * @param path     - Path to check
-     * @param patterns - Exclude patterns
-     * @return true if path should be excluded
+     * Check if a path should be excluded based on pre-compiled matchers.
+     * Uses Path checking instead of String checking for better correctness.
      */
-    private boolean shouldExclude(String path, Set<String> patterns) {
-        PathMatcher matcher;
-
-        for (String pattern : patterns) {
-            try {
-                // Convert pattern to glob syntax
-                String globPattern = "glob:" + pattern;
-                matcher = FileSystems.getDefault().getPathMatcher(globPattern);
-
-                if (matcher.matches(Paths.get(path))) {
-                    return true;
-                }
-            } catch (Exception e) {
-                log.warn("Invalid exclude pattern: {}", pattern);
+    private boolean shouldExclude(Path path, List<PathMatcher> matchers) {
+        for (PathMatcher matcher : matchers) {
+            if (matcher.matches(path)) {
+                return true;
             }
         }
-
         return false;
     }
 
@@ -582,7 +607,13 @@ public class ConcatenationService {
 
             for (Path file : files) {
                 String relativePath = projectPath.relativize(file).toString();
-                String fileContent = Files.readString(file);
+                String fileContent;
+                try {
+                    fileContent = Files.readString(file);
+                } catch (IOException e) {
+                    log.warn("Failed to read file content (skipping): {} - {}", relativePath, e.getMessage());
+                    continue;
+                }
 
                 // Clean content if requested
                 if (Boolean.TRUE.equals(request.getRemoveComments()) || Boolean.TRUE.equals(request.getMinify())) {

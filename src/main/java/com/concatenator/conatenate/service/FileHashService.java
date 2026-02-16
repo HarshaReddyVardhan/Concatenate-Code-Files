@@ -28,18 +28,21 @@ public class FileHashService {
      */
     public String calculateFileHash(Path filePath) throws IOException {
         try {
-            // Get SHA-256 algorithm instance
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            // Read all file bytes and compute hash
-            byte[] fileBytes = Files.readAllBytes(filePath);
-            byte[] hashBytes = digest.digest(fileBytes);
+            try (java.io.InputStream is = Files.newInputStream(filePath);
+                    java.security.DigestInputStream dis = new java.security.DigestInputStream(is, digest)) {
 
-            // Convert hash bytes to hexadecimal string
-            return bytesToHex(hashBytes);
+                // Read file in chunks to update digest
+                byte[] buffer = new byte[8192];
+                while (dis.read(buffer) != -1) {
+                    // Reading updates the digest automatically
+                }
+            }
+
+            return bytesToHex(digest.digest());
 
         } catch (NoSuchAlgorithmException e) {
-            // This should never happen - SHA-256 is always available
             log.error("SHA-256 algorithm not available", e);
             throw new RuntimeException("SHA-256 algorithm not available", e);
         }
