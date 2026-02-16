@@ -55,16 +55,41 @@ public class ConcatenationService {
             ".graphql", ".gql", // GraphQL
             ".sql"); // Database migrations
 
-    // Directories to ALWAYS exclude (build artifacts, dependencies)
+    // Directories to ALWAYS exclude (build artifacts, dependencies, noise)
     private static final Set<String> DEFAULT_EXCLUDE_PATTERNS = Set.of(
-            "target/**", "build/**", "dist/**", "out/**",
-            "node_modules/**", ".git/**", "bin/**", "obj/**",
-            "vendor/**", // Go dependencies / PHP
-            "testdata/**", // Go test data
-            "__pycache__/**", ".pytest_cache/**", "venv/**", ".venv/**",
-            ".idea/**", ".vscode/**", ".zed/**", // Editors
-            "*.exe", "*.dll", "*.so", "*.dylib", "*.class", "*.jar", "*.war",
-            "*.pdb", "*.out", "*.test"); // Build outputs and debug symbols
+            // Build output
+            "dist/**", "build/**", "out/**", "_output/**", "public/build/**", "client/dist/**", "server/dist/**",
+            // Bundled assets
+            "**/assets/*.js", "**/assets/*.css", "**/assets/*.map", "**/*.bundle.js", "**/*.bundle.css",
+            "**/manifest.json", "**/index.html",
+            // Dependencies
+            "node_modules/**", "**/node_modules/**",
+            // Lockfiles
+            "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "**/package-lock.json", "**/yarn.lock",
+            "**/pnpm-lock.yaml",
+            // IDE/Editor
+            ".idea/**", ".vscode/**", ".zed/**", "*.swp", "*~", ".DS_Store", "Thumbs.db",
+            // Logs
+            "*.log", "npm-debug.log*", "yarn-error.log*", "yarn-debug.log*",
+            // Git/VC
+            ".git/**", ".gitignore", ".gitattributes", ".gitmodules", ".hg/**", ".svn/**",
+            // OS Junk
+            "desktop.ini", "ehthumbs.db",
+            // Config files to exclude (per user request)
+            "**/*.json", "**/*.yml", "**/*.yaml", "**/*.toml", "**/*.env*", "**/*.config.*",
+            // Types
+            "**/node_modules/**/*.d.ts", "**/@types/**/*.d.ts", "**/lib/**/*.d.ts",
+            // Binary
+            "**/*.exe", "**/*.dll", "**/*.so", "**/*.dylib", "**/*.o", "**/*.obj", "**/*.a", "**/*.lib", "*.class",
+            "*.jar", "*.war", "*.pdb",
+            // Cache / Temp
+            ".cache/**", "**/.cache/**", "**/.vite/**", "**/.rollup/**", "**/.esbuild/**", "**/.nyc_output/**",
+            "coverage/**",
+            "**/node_modules/.cache/**", "**/node_modules/.vite/**", "**/node_modules/.bin/**",
+            "**/node_modules/.package-lock.json",
+            // Tests
+            "**/*.test.ts", "**/*.test.js", "**/*.spec.ts", "**/*.spec.js",
+            "**/tmp/**", "**/temp/**");
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
@@ -772,9 +797,9 @@ public class ConcatenationService {
      */
     private Set<String> mergeSettings(Set<String> requestSettings, Set<String> userSettings) {
         if (requestSettings != null && !requestSettings.isEmpty()) {
-            return requestSettings;
+            return new HashSet<>(requestSettings);
         }
-        return userSettings != null ? userSettings : new HashSet<>();
+        return userSettings != null ? new HashSet<>(userSettings) : new HashSet<>();
     }
 
     /**
