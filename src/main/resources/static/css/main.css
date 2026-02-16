@@ -508,13 +508,7 @@ input[type="number"]:focus {
     margin: 0;
     padding: 0;
     position: relative;
-    /* Indentation for children */
-    padding-left: 20px;
-}
-
-/* Root level should not have extra padding */
-.tree-ul>.tree-li {
-    padding-left: 0;
+    /* Removed incorrect padding */
 }
 
 .tree-item-content {
@@ -584,6 +578,9 @@ input[type="number"]:focus {
 
 .tree-children {
     display: none;
+    margin-left: 24px; /* Step indentation */
+    border-left: 1px solid #cbd5e0; /* Guideline for hierarchy */
+    padding-left: 4px; /* Spacing from the guideline */
 }
 
 .tree-children.active {
