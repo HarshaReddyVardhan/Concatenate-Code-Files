@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributeView;
@@ -32,84 +33,10 @@ public class ConcatenationService {
     private static final String XML_FILE_END = "</file>\n";
     private static final long MB_TO_BYTES = 1024 * 1024;
 
-    // Config files to ALWAYS include (useful for AI context)
-    private static final Set<String> ALWAYS_INCLUDE_FILES = Set.of(
-            "Dockerfile", "Jenkinsfile", "Makefile", "Procfile",
-            "docker-compose.yml", "docker-compose.yaml",
-            "pom.xml", "build.gradle", "settings.gradle",
-            "Cargo.toml", "Cargo.lock", // Rust
-            "go.mod", "go.sum", // Go
-            "package.json", "yarn.lock", "pnpm-lock.yaml", // Node/JS
-            "composer.json", "composer.lock", // PHP
-            "requirements.txt", "pyproject.toml", // Python
-            "mix.exs", // Elixir
-            ".gitignore", ".dockerignore",
-            // Web / Frontend / Configs
-            "index.html",
-            "vite.config.js", "vite.config.ts",
-            "vue.config.js", "vue.config.ts",
-            "nuxt.config.js", "nuxt.config.ts",
-            "next.config.js", "next.config.ts", "next.config.mjs",
-            "svelte.config.js",
-            "rollup.config.js", "rollup.config.ts",
-            "webpack.config.js", "webpack.config.ts", "webpack.config.cjs",
-            "jest.config.js", "jest.config.ts",
-            "vitest.config.ts", "vitest.config.js",
-            "playwright.config.ts", "playwright.config.js",
-            "cypress.config.ts", "cypress.config.js", "cypress.json",
-            "tailwind.config.js", "tailwind.config.ts", "tailwind.config.cjs",
-            "postcss.config.js", "postcss.config.cjs",
-            "eslint.config.js", "eslint.config.mjs",
-            "prettier.config.js", ".prettierrc.js", ".eslintrc.js",
-            // JSON Configs
-            "tsconfig.json", "jsconfig.json",
-            "angular.json", "nx.json", "turbo.json", "lerna.json");
-
-    // Config/script extensions to ALWAYS include
-    private static final Set<String> ALWAYS_INCLUDE_EXTENSIONS = Set.of(
-            ".yml", ".yaml", ".xml", ".json", ".properties", ".conf",
-            ".sh", ".bat", ".cmd", ".ps1",
-            ".toml", ".ini", ".cfg", ".env",
-            ".hcl", ".tf", // Terraform / HashiCorp
-            ".proto", // Protocol Buffers
-            ".graphql", ".gql", // GraphQL
-            ".sql"); // Database migrations
-
-    // Directories to ALWAYS exclude (build artifacts, dependencies, noise)
-    private static final Set<String> DEFAULT_EXCLUDE_PATTERNS = Set.of(
-            // Build output
-            "dist/**", "build/**", "out/**", "_output/**", "public/build/**", "client/dist/**", "server/dist/**",
-            // Bundled assets
-            "**/assets/*.js", "**/assets/*.css", "**/assets/*.map", "**/*.bundle.js", "**/*.bundle.css",
-            "**/manifest.json", "**/index.html",
-            // Dependencies
-            "node_modules/**", "**/node_modules/**",
-            // Lockfiles
-            "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "**/package-lock.json", "**/yarn.lock",
-            "**/pnpm-lock.yaml",
-            // IDE/Editor
-            ".idea/**", ".vscode/**", ".zed/**", "*.swp", "*~", ".DS_Store", "Thumbs.db",
-            // Logs
-            "*.log", "npm-debug.log*", "yarn-error.log*", "yarn-debug.log*",
-            // Git/VC
-            ".git/**", ".gitignore", ".gitattributes", ".gitmodules", ".hg/**", ".svn/**",
-            // OS Junk
-            "desktop.ini", "ehthumbs.db",
-            // Config files to exclude (per user request)
-            "**/*.json", "**/*.yml", "**/*.yaml", "**/*.toml", "**/*.env*", "**/*.config.*",
-            // Types
-            "**/node_modules/**/*.d.ts", "**/@types/**/*.d.ts", "**/lib/**/*.d.ts",
-            // Binary
-            "**/*.exe", "**/*.dll", "**/*.so", "**/*.dylib", "**/*.o", "**/*.obj", "**/*.a", "**/*.lib", "*.class",
-            "*.jar", "*.war", "*.pdb",
-            // Cache / Temp
-            ".cache/**", "**/.cache/**", "**/.vite/**", "**/.rollup/**", "**/.esbuild/**", "**/.nyc_output/**",
-            "coverage/**",
-            "**/node_modules/.cache/**", "**/node_modules/.vite/**", "**/node_modules/.bin/**",
-            "**/node_modules/.package-lock.json",
-            // Tests
-            "**/*.test.ts", "**/*.test.js", "**/*.spec.ts", "**/*.spec.js",
-            "**/tmp/**", "**/temp/**");
+    // Configs loaded from JSON
+    private Set<String> alwaysIncludeFiles;
+    private Set<String> alwaysIncludeExtensions;
+    private Set<String> defaultExcludePatterns;
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
@@ -117,6 +44,31 @@ public class ConcatenationService {
         this.fileHashService = fileHashService;
         this.userSettingsService = userSettingsService;
         this.objectMapper = objectMapper;
+        loadDefaultConfigs();
+    }
+
+    private void loadDefaultConfigs() {
+        try {
+            this.alwaysIncludeFiles = loadConfigSet("default-inclusions.json");
+            this.alwaysIncludeExtensions = loadConfigSet("default-extensions.json");
+            this.defaultExcludePatterns = loadConfigSet("default-exclusions.json");
+        } catch (Exception e) {
+            log.error("Failed to load default configurations", e);
+            this.alwaysIncludeFiles = new HashSet<>();
+            this.alwaysIncludeExtensions = new HashSet<>();
+            this.defaultExcludePatterns = new HashSet<>();
+        }
+    }
+
+    private Set<String> loadConfigSet(String fileName) throws IOException {
+        try (InputStream is = getClass().getResourceAsStream("/" + fileName)) {
+            if (is == null) {
+                log.warn("Configuration file not found: {}", fileName);
+                return new HashSet<>();
+            }
+            return objectMapper.readValue(is, new com.fasterxml.jackson.core.type.TypeReference<Set<String>>() {
+            });
+        }
     }
 
     /**
@@ -249,7 +201,7 @@ public class ConcatenationService {
                 excludePatterns.add(relativeOut + "/**");
             }
             // Add default exclusions for build artifacts and dependencies
-            excludePatterns.addAll(DEFAULT_EXCLUDE_PATTERNS);
+            excludePatterns.addAll(defaultExcludePatterns);
             // Exclude the metadata file itself
             excludePatterns.add(METADATA_FILE_NAME);
 
@@ -440,7 +392,7 @@ public class ConcatenationService {
                 String fileName = file.getFileName().toString();
                 String extension = "." + FilenameUtils.getExtension(fileName);
 
-                boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
+                boolean isAlwaysIncludeFile = alwaysIncludeFiles.contains(fileName);
 
                 // Skip if excluded (unless it's an always-include file)
                 if (!isAlwaysIncludeFile && shouldExclude(relativePath, excludePatterns)) {
@@ -462,7 +414,7 @@ public class ConcatenationService {
                 // Include if: matches user extensions OR is a config file/script
                 boolean matchesUserExtension = includeExtensions.contains(extension);
                 // isAlwaysIncludeFile already calculated above
-                boolean isAlwaysIncludeExtension = ALWAYS_INCLUDE_EXTENSIONS.contains(extension);
+                boolean isAlwaysIncludeExtension = alwaysIncludeExtensions.contains(extension);
 
                 if ((matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) &&
                         isTextFile(file)) {

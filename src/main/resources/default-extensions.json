@@ -1,0 +1,22 @@
+[
+    ".yml",
+    ".yaml",
+    ".xml",
+    ".json",
+    ".properties",
+    ".conf",
+    ".sh",
+    ".bat",
+    ".cmd",
+    ".ps1",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".env",
+    ".hcl",
+    ".tf",
+    ".proto",
+    ".graphql",
+    ".gql",
+    ".sql"
+]
