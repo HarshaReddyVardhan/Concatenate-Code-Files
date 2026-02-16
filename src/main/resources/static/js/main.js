@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let envState = { isDocker: false, isHeadless: false };
 let currentTargetInputId = null;
 let currentBrowsePath = "/"; // Default start path for Docker
+let selectedFilePaths = []; // Global store for selected files relative paths
 
 async function checkEnvironment() {
     try {
@@ -302,13 +303,35 @@ async function generateConcatenation(incremental = false) {
 
     try {
         const endpoint = incremental ? '/api/update' : '/api/generate';
+        console.log("Sending request to:", endpoint); // Debug log
+
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData)
         });
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            // Not JSON (e.g. 404 HTML page)
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            }
+            throw new Error("Invalid response from server");
+        }
+
+        // Handle standard Spring Boot errors (which don't have success field)
+        if (typeof data.success === 'undefined' && data.status && data.error) {
+            data.success = false;
+            let msg = `Error ${data.status}: ${data.error}`;
+            if (data.message && data.message !== 'No message available') {
+                msg += ` - ${data.message}`;
+            }
+            data.message = msg;
+        }
+
         setLoading(false);
         displayResult(data);
 
@@ -430,7 +453,6 @@ function escapeHtml(unsafe) {
 
 /* --- File Selection Tree Logic --- */
 
-let selectedFilePaths = []; // Global store for selected files relative paths
 let loadedFileTree = null; // Cache tree data
 
 async function openFileSelectionModal() {

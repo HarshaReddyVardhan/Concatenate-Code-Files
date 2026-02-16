@@ -304,9 +304,21 @@ public class ConcatenationService {
                 asciiTree = generateAsciiTree(projectPath, allFiles);
             }
 
-            for (Map.Entry<String, List<Path>> entry : filesByFolder.entrySet()) {
-                String folderName = entry.getKey();
-                List<Path> files = entry.getValue();
+            // Sort folders to ensure deterministic order (and put root/src first if
+            // possible)
+            List<String> sortedFolders = new ArrayList<>(filesByFolder.keySet());
+            Collections.sort(sortedFolders);
+
+            boolean treeIncluded = false;
+
+            for (String folderName : sortedFolders) {
+                List<Path> files = filesByFolder.get(folderName);
+                String treeForThisBatch = null;
+
+                if (!treeIncluded && Boolean.TRUE.equals(request.getIncludeFileTree())) {
+                    treeForThisBatch = asciiTree;
+                    treeIncluded = true;
+                }
 
                 ConcatenationOutput output = concatenateFilesWithSplit(
                         files,
@@ -315,7 +327,7 @@ public class ConcatenationService {
                         folderName,
                         maxFileSizeMb,
                         request,
-                        request.getIncludeFileTree() ? asciiTree : null);
+                        treeForThisBatch);
 
                 outputFiles.addAll(output.getFilePaths());
                 totalTokens += output.getTokenCount();
