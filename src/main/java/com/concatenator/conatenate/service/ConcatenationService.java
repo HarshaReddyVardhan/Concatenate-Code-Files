@@ -200,6 +200,23 @@ public class ConcatenationService {
                 excludePatterns.add(relativeOut);
                 excludePatterns.add(relativeOut + "/**");
             }
+
+            // Also exclude the requested output folder itself if it's inside the project
+            // (e.g. if user asked for "dist" and we generate "dist/ProjectName_Output",
+            // "dist" might explicitly contain other junk)
+            if (outputFolderRequest != null && !outputFolderRequest.isBlank()) {
+                Path requestedPath = Paths.get(outputFolderRequest);
+                Path absRequestedPath = requestedPath.isAbsolute() ? requestedPath
+                        : projectPath.resolve(requestedPath);
+
+                if (absRequestedPath.startsWith(projectPath)) {
+                    String rel = projectPath.relativize(absRequestedPath).toString();
+                    if (!rel.isEmpty()) {
+                        excludePatterns.add(rel);
+                        excludePatterns.add(rel + "/**");
+                    }
+                }
+            }
             // Add default exclusions for build artifacts and dependencies
             excludePatterns.addAll(defaultExcludePatterns);
             // Exclude the metadata file itself

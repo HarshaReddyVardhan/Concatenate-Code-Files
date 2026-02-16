@@ -6,6 +6,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.concatenator.conatenate.service.ConcatenationService;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.awt.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,6 +21,9 @@ class UtilsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private ConcatenationService concatenationService;
 
     @Test
     void testGetEnvInfo() throws Exception {
