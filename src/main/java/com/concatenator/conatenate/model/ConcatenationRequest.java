@@ -39,4 +39,13 @@ public class ConcatenationRequest {
 
     @Builder.Default
     private Boolean estimateTokens = false;
+
+    @Builder.Default
+    private Boolean removeComments = false;
+
+    @Builder.Default
+    private Boolean removeRedundantWhitespace = false;
+
+    @Builder.Default
+    private Boolean includeFileHeader = true;
 }

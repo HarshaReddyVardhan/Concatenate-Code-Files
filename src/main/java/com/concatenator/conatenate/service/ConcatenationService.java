@@ -12,6 +12,8 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributeView;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,37 +37,34 @@ public class ConcatenationService {
             "Dockerfile", "Jenkinsfile", "Makefile", "Procfile",
             "docker-compose.yml", "docker-compose.yaml",
             "pom.xml", "build.gradle", "settings.gradle",
-            "Cargo.toml", "Cargo.lock",               // Rust
-            "go.mod", "go.sum",                       // Go
+            "Cargo.toml", "Cargo.lock", // Rust
+            "go.mod", "go.sum", // Go
             "package.json", "yarn.lock", "pnpm-lock.yaml", // Node/JS
-            "composer.json", "composer.lock",         // PHP
-            "requirements.txt", "pyproject.toml",     // Python
-            "mix.exs",                                // Elixir
+            "composer.json", "composer.lock", // PHP
+            "requirements.txt", "pyproject.toml", // Python
+            "mix.exs", // Elixir
             ".gitignore", ".dockerignore");
-
 
     // Config/script extensions to ALWAYS include
     private static final Set<String> ALWAYS_INCLUDE_EXTENSIONS = Set.of(
             ".yml", ".yaml", ".xml", ".json", ".properties", ".conf",
             ".sh", ".bat", ".cmd", ".ps1",
             ".toml", ".ini", ".cfg", ".env",
-            ".hcl", ".tf",          // Terraform / HashiCorp
-            ".proto",               // Protocol Buffers
-            ".graphql", ".gql",     // GraphQL
-            ".sql");                // Database migrations
-
+            ".hcl", ".tf", // Terraform / HashiCorp
+            ".proto", // Protocol Buffers
+            ".graphql", ".gql", // GraphQL
+            ".sql"); // Database migrations
 
     // Directories to ALWAYS exclude (build artifacts, dependencies)
     private static final Set<String> DEFAULT_EXCLUDE_PATTERNS = Set.of(
             "target/**", "build/**", "dist/**", "out/**",
             "node_modules/**", ".git/**", "bin/**", "obj/**",
-            "vendor/**",            // Go dependencies / PHP
-            "testdata/**",          // Go test data
+            "vendor/**", // Go dependencies / PHP
+            "testdata/**", // Go test data
             "__pycache__/**", ".pytest_cache/**", "venv/**", ".venv/**",
             ".idea/**", ".vscode/**", ".zed/**", // Editors
             "*.exe", "*.dll", "*.so", "*.dylib", "*.class", "*.jar", "*.war",
             "*.pdb", "*.out", "*.test"); // Build outputs and debug symbols
-
 
     public ConcatenationService(FileHashService fileHashService,
             UserSettingsService userSettingsService,
@@ -77,13 +76,15 @@ public class ConcatenationService {
 
     /**
      * Checks if a file is a text file by scanning for NUL bytes.
+     * 
      * @param path The path to the file
      * @return true if it appears to be a text file
      */
     private boolean isTextFile(Path path) {
         try {
             // Only check files that have content
-            if (Files.size(path) == 0) return true;
+            if (Files.size(path) == 0)
+                return true;
 
             byte[] buffer = new byte[1024];
             try (java.io.InputStream is = Files.newInputStream(path)) {
@@ -101,6 +102,34 @@ public class ConcatenationService {
         }
     }
 
+    private String stripComments(String code) {
+        // Regex to match strings (preserving them) OR comments (stripping them)
+        // Group 1: Double quoted string
+        // Group 2: Single quoted string
+        // Group 3: Block comment or Line comment
+        Pattern pattern = Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*')|(/\\*[\\s\\S]*?\\*/|//.*)");
+        Matcher matcher = pattern.matcher(code);
+
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            if (matcher.group(1) != null) {
+                // It's a string, keep it
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(1)));
+            } else {
+                // It's a comment, replace with empty
+                matcher.appendReplacement(sb, "");
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String compactWhitespace(String code) {
+        // Remove lines that are only whitespace
+        String noEmptyLines = code.replaceAll("(?m)^\\s+$", "");
+        // clear multiple newlines
+        return noEmptyLines.replaceAll("\\n{3,}", "\n\n");
+    }
 
     /**
      * MAIN METHOD: Generate concatenated files for a project.
@@ -180,8 +209,9 @@ public class ConcatenationService {
             excludePatterns.add(METADATA_FILE_NAME);
 
             // Step 4: Scan project files
-            log.info("Scanning project files...");
-            List<Path> allFiles = scanProjectFiles(projectPath, excludePatterns, includeExtensions);
+            long maxSizeBytes = maxFileSizeMb * MB_TO_BYTES;
+            log.info("Scanning project files... (Max file size: {} MB)", maxFileSizeMb);
+            List<Path> allFiles = scanProjectFiles(projectPath, excludePatterns, includeExtensions, maxSizeBytes);
 
             // AUTO-FIX: Double check exclusion
             if (outputPath.startsWith(projectPath)) {
@@ -270,7 +300,7 @@ public class ConcatenationService {
                         outputPath,
                         folderName,
                         maxFileSizeMb,
-                        request.getUseXmlTags(),
+                        request,
                         request.getIncludeFileTree() ? asciiTree : null);
 
                 outputFiles.addAll(output.getFilePaths());
@@ -339,7 +369,8 @@ public class ConcatenationService {
      */
     private List<Path> scanProjectFiles(Path projectPath,
             Set<String> excludePatterns,
-            Set<String> includeExtensions) throws IOException {
+            Set<String> includeExtensions,
+            long maxFileSizeBytes) throws IOException {
 
         List<Path> files = new ArrayList<>();
 
@@ -369,13 +400,25 @@ public class ConcatenationService {
                     return FileVisitResult.CONTINUE;
                 }
 
+                // Check file size
+                try {
+                    long fileSize = Files.size(file);
+                    if (maxFileSizeBytes > 0 && fileSize > maxFileSizeBytes) {
+                        log.debug("Skipping file {} ({} bytes) - exceeds max size of {} bytes",
+                                relativePath, fileSize, maxFileSizeBytes);
+                        return FileVisitResult.CONTINUE;
+                    }
+                } catch (IOException e) {
+                    log.warn("Could not determine size of file: {}", relativePath);
+                }
+
                 // Include if: matches user extensions OR is a config file/script
                 boolean matchesUserExtension = includeExtensions.contains(extension);
                 boolean isAlwaysIncludeFile = ALWAYS_INCLUDE_FILES.contains(fileName);
                 boolean isAlwaysIncludeExtension = ALWAYS_INCLUDE_EXTENSIONS.contains(extension);
 
                 if ((matchesUserExtension || isAlwaysIncludeFile || isAlwaysIncludeExtension) &&
-                 isTextFile(file)) {
+                        isTextFile(file)) {
                     files.add(file);
                 } else if (isAlwaysIncludeFile || isAlwaysIncludeExtension) {
                     log.warn("Skipping file: {}", relativePath);
@@ -481,7 +524,7 @@ public class ConcatenationService {
             Path outputPath,
             String folderName,
             int maxFileSizeMb,
-            Boolean useXmlTags,
+            ConcatenationRequest request,
             String asciiTree) throws IOException {
 
         List<String> outputFiles = new ArrayList<>();
@@ -513,13 +556,28 @@ public class ConcatenationService {
                 String relativePath = projectPath.relativize(file).toString();
                 String fileContent = Files.readString(file);
 
-                String entryStart;
+                // Clean content if requested
+                if (Boolean.TRUE.equals(request.getRemoveComments())) {
+                    fileContent = stripComments(fileContent);
+                }
+                if (Boolean.TRUE.equals(request.getRemoveRedundantWhitespace())) {
+                    fileContent = compactWhitespace(fileContent);
+                }
+
+                String entryStart = "";
                 String entryEnd = "\n\n";
-                if (Boolean.TRUE.equals(useXmlTags)) {
-                    entryStart = String.format(XML_FILE_START, relativePath);
-                    entryEnd = XML_FILE_END + "\n";
+
+                // Check if header should be included
+                if (Boolean.TRUE.equals(request.getIncludeFileHeader())) {
+                    if (Boolean.TRUE.equals(request.getUseXmlTags())) {
+                        entryStart = String.format(XML_FILE_START, relativePath);
+                        entryEnd = XML_FILE_END + "\n";
+                    } else {
+                        entryStart = String.format(FILE_SEPARATOR, relativePath);
+                    }
                 } else {
-                    entryStart = String.format(FILE_SEPARATOR, relativePath);
+                    // If no header, maybe just a newline separator?
+                    entryStart = "\n"; // minimal separation
                 }
 
                 long entrySize = entryStart.getBytes().length + fileContent.getBytes().length
