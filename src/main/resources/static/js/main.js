@@ -273,6 +273,9 @@ async function generateConcatenation(incremental = false) {
     const useXmlTags = document.getElementById('useXmlTags').checked;
     const includeFileTree = document.getElementById('includeFileTree').checked;
     const estimateTokens = document.getElementById('estimateTokens').checked;
+    const includeFileHeader = document.getElementById('includeFileHeader').checked;
+    const removeComments = document.getElementById('removeComments').checked;
+    const removeRedundantWhitespace = document.getElementById('removeRedundantWhitespace').checked;
 
     if (!projectPath) {
         alert('Please enter a project path');
@@ -289,6 +292,9 @@ async function generateConcatenation(incremental = false) {
         useXmlTags,
         includeFileTree,
         estimateTokens,
+        includeFileHeader,
+        removeComments,
+        removeRedundantWhitespace,
         selectedFilePaths: (selectedFilePaths && selectedFilePaths.length > 0) ? selectedFilePaths : null
     };
 
