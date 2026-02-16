@@ -48,4 +48,7 @@ public class ConcatenationRequest {
 
     @Builder.Default
     private Boolean includeFileHeader = true;
+
+    @Builder.Default
+    private Boolean minify = false;
 }

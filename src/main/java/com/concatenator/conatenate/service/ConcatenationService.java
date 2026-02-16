@@ -556,10 +556,15 @@ public class ConcatenationService {
                 String fileContent = Files.readString(file);
 
                 // Clean content if requested
-                if (Boolean.TRUE.equals(request.getRemoveComments())) {
+                if (Boolean.TRUE.equals(request.getRemoveComments()) || Boolean.TRUE.equals(request.getMinify())) {
                     fileContent = stripComments(fileContent);
                 }
-                if (Boolean.TRUE.equals(request.getRemoveRedundantWhitespace())) {
+                if (Boolean.TRUE.equals(request.getMinify())) {
+                    // Aggressive minify: Remove all empty lines and reduce multiple newlines to
+                    // single
+                    fileContent = fileContent.replaceAll("(?m)^\\s+$", "");
+                    fileContent = fileContent.replaceAll("\\n+", "\n").trim();
+                } else if (Boolean.TRUE.equals(request.getRemoveRedundantWhitespace())) {
                     fileContent = compactWhitespace(fileContent);
                 }
 
@@ -571,12 +576,22 @@ public class ConcatenationService {
                     if (Boolean.TRUE.equals(request.getUseXmlTags())) {
                         entryStart = String.format(XML_FILE_START, relativePath);
                         entryEnd = XML_FILE_END + "\n";
+                    } else if (Boolean.TRUE.equals(request.getMinify())) {
+                        // Minimal header as requested
+                        entryStart = String.format("File: %s\n", relativePath);
+                        entryEnd = "\n";
                     } else {
                         entryStart = String.format(FILE_SEPARATOR, relativePath);
                     }
                 } else {
                     // If no header, maybe just a newline separator?
                     entryStart = "\n"; // minimal separation
+                }
+
+                // If minified, ensure we don't add extra newlines
+                if (Boolean.TRUE.equals(request.getMinify())) {
+                    if (entryEnd.equals("\n\n"))
+                        entryEnd = "\n";
                 }
 
                 long entrySize = entryStart.getBytes().length + fileContent.getBytes().length

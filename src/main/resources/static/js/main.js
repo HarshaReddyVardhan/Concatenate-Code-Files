@@ -276,6 +276,7 @@ async function generateConcatenation(incremental = false) {
     const includeFileHeader = document.getElementById('includeFileHeader').checked;
     const removeComments = document.getElementById('removeComments').checked;
     const removeRedundantWhitespace = document.getElementById('removeRedundantWhitespace').checked;
+    const minify = document.getElementById('minify').checked;
 
     if (!projectPath) {
         alert('Please enter a project path');
@@ -295,6 +296,7 @@ async function generateConcatenation(incremental = false) {
         includeFileHeader,
         removeComments,
         removeRedundantWhitespace,
+        minify,
         selectedFilePaths: (selectedFilePaths && selectedFilePaths.length > 0) ? selectedFilePaths : null
     };
 
