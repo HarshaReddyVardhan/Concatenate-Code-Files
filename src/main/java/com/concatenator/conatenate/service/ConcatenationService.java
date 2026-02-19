@@ -616,9 +616,10 @@ public class ConcatenationService {
                 }
 
                 // Clean content if requested
-                if (Boolean.TRUE.equals(request.getRemoveComments()) || Boolean.TRUE.equals(request.getMinify())) {
+                if (Boolean.TRUE.equals(request.getRemoveComments())) {
                     fileContent = stripComments(fileContent);
                 }
+
                 if (Boolean.TRUE.equals(request.getMinify())) {
                     // Aggressive minify: Remove all empty lines and reduce multiple newlines to
                     // single
