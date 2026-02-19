@@ -677,6 +677,14 @@ public class ConcatenationService {
                 }
 
                 // Write content
+                if (writer == null) {
+                    // Fallback if writer is null (shouldn't happen due to logic above, but safe)
+                    currentOutputFile = outputPath.resolve(folderName + "-" + fileIndex + ".txt");
+                    writer = Files.newBufferedWriter(currentOutputFile, StandardOpenOption.CREATE,
+                            StandardOpenOption.TRUNCATE_EXISTING);
+                    outputFiles.add(currentOutputFile.toString());
+                }
+
                 writer.write(entryStart);
                 writer.write(fileContent);
                 writer.write(entryEnd);
